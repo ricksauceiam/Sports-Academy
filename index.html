@@ -412,6 +412,25 @@ body {
 .plays-hdr-title{font-family:var(--font);font-size:17px;font-weight:800;color:var(--text);}
 .plays-ct-badge{font-size:12px;color:var(--text-2);background:var(--bg);padding:3px 10px;border-radius:999px;font-weight:600;}
 
+/* ─── LANDING ─── */
+.landing-hero{text-align:center;padding:2.5rem 1.5rem 2rem;}
+.landing-role-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 1.5rem 2rem;}
+.role-card{border-radius:var(--radius-lg);padding:2rem 1rem 1.75rem;text-align:center;cursor:pointer;border:2.5px solid transparent;transition:all .15s;}
+.role-card:active{transform:scale(0.96);}
+.role-card-icon{font-size:52px;display:block;margin-bottom:12px;}
+.role-card-name{font-family:var(--font);font-size:20px;font-weight:900;margin-bottom:4px;}
+.role-card-sub{font-size:12px;font-weight:600;opacity:.75;}
+.role-player{background:#E6F1FB;color:#0C447C;}
+.role-player:hover{border-color:#185FA5;}
+.role-coach{background:#EAF3DE;color:#27500A;}
+.role-coach:hover{border-color:#3B6D11;}
+
+/* ─── COACH SCREEN ─── */
+.coach-screen{padding:1.5rem;}
+.coach-header{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;}
+.coach-back{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-2);padding:4px;}
+.coach-title{font-family:var(--font);font-size:22px;font-weight:900;color:var(--text);}
+
 /* ─── CONFETTI ─── */
 .confetti-piece {
   position: fixed; top: -10px; width: 10px; height: 10px;
@@ -433,19 +452,154 @@ body {
 <body>
 <div class="app">
 
+<!-- ═══ LANDING ═══ -->
+<div id="landing" class="screen active">
+  <div class="landing-hero">
+    <div class="trophy-wrap">
+      <span class="trophy-center">🏆</span>
+      <span class="orbit-ball o1" style="position:absolute;animation:spin 4s linear infinite reverse;">⚽</span>
+      <span class="orbit-ball o2" style="position:absolute;animation:spin 4s linear infinite reverse;animation-delay:-1.33s;">🏀</span>
+      <span class="orbit-ball o3" style="position:absolute;animation:spin 4s linear infinite reverse;animation-delay:-2.66s;">⚾</span>
+    </div>
+    <div class="ob-title" style="margin-top:8px;">Sports Academy</div>
+    <div class="ob-sub" style="margin-top:6px;">Who are you today?</div>
+  </div>
+  <div class="landing-role-grid">
+    <div class="role-card role-player" onclick="chooseRole('player')">
+      <span class="role-card-icon">🏃</span>
+      <div class="role-card-name">Player</div>
+      <div class="role-card-sub">Learn & level up</div>
+    </div>
+    <div class="role-card role-coach" onclick="chooseRole('coach')">
+      <span class="role-card-icon">📋</span>
+      <div class="role-card-name">Coach</div>
+      <div class="role-card-sub">Design plays</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ COACH SCREEN ═══ -->
+<div id="coach-screen" class="screen">
+  <div class="coach-screen">
+    <!-- PIN -->
+    <div id="coach-lock">
+      <div class="coach-header">
+        <button class="coach-back" onclick="show('landing')">←</button>
+        <div class="coach-title">Coach login</div>
+      </div>
+      <div class="admin-lock" style="padding:0;">
+        <div class="lock-icon">🔐</div>
+        <div class="lock-title">Enter your PIN</div>
+        <div class="lock-sub">4-digit coach access code</div>
+        <div class="pin-row">
+          <div class="pin-dot" id="cp0"></div><div class="pin-dot" id="cp1"></div>
+          <div class="pin-dot" id="cp2"></div><div class="pin-dot" id="cp3"></div>
+        </div>
+        <div class="numpad">
+          <div class="nkey" onclick="coachPin('1')">1</div><div class="nkey" onclick="coachPin('2')">2</div><div class="nkey" onclick="coachPin('3')">3</div>
+          <div class="nkey" onclick="coachPin('4')">4</div><div class="nkey" onclick="coachPin('5')">5</div><div class="nkey" onclick="coachPin('6')">6</div>
+          <div class="nkey" onclick="coachPin('7')">7</div><div class="nkey" onclick="coachPin('8')">8</div><div class="nkey" onclick="coachPin('9')">9</div>
+          <div class="nkey" onclick="coachPin('del')">⌫</div><div class="nkey" onclick="coachPin('0')">0</div><div class="nkey" onclick="coachPin('clr')">✕</div>
+        </div>
+        <div class="pin-err" id="coach-pin-err"></div>
+      </div>
+    </div>
+    <!-- COACH HUB (play designer only) -->
+    <div id="coach-hub" style="display:none;">
+      <div class="coach-header">
+        <button class="coach-back" onclick="coachLogout()">← Logout</button>
+        <div class="coach-title">Coach mode 📋</div>
+      </div>
+      <!-- Mode tabs -->
+      <div class="pd-mode-tabs">
+        <div class="pd-mtab on" onclick="coachSwitch('playbook',this)">📋 Playbook</div>
+        <div class="pd-mtab" onclick="coachSwitch('design',this)">✏️ Design</div>
+      </div>
+      <!-- Playbook pane -->
+      <div id="coach-playbook" class="pd-pane active">
+        <div class="plays-hdr">
+          <div class="plays-hdr-title">All saved plays</div>
+          <div class="plays-ct-badge" id="coach-plays-ct">Loading...</div>
+        </div>
+        <div id="coach-plays-list"><div class="pd-empty">Loading...</div></div>
+      </div>
+      <!-- Design pane -->
+      <div id="coach-design" class="pd-pane">
+        <!-- Setup -->
+        <div id="coach-setup">
+          <div class="lock-title" style="margin-bottom:14px;">Set up your play</div>
+          <div class="setup-row">
+            <div class="setup-lbl" style="color:#3b82f6;">🔵 Team players</div>
+            <div class="count-btns" id="coach-team-counts">
+              <div class="cnt-btn on" onclick="coachSetCount('team',1,this)">1</div>
+              <div class="cnt-btn" onclick="coachSetCount('team',2,this)">2</div>
+              <div class="cnt-btn" onclick="coachSetCount('team',3,this)">3</div>
+              <div class="cnt-btn" onclick="coachSetCount('team',4,this)">4</div>
+              <div class="cnt-btn" onclick="coachSetCount('team',5,this)">5</div>
+            </div>
+          </div>
+          <div class="setup-row">
+            <div class="setup-lbl" style="color:#ef4444;">🔴 Opponents</div>
+            <div class="count-btns" id="coach-opp-counts">
+              <div class="cnt-btn on opp-on" onclick="coachSetCount('opp',0,this)">0</div>
+              <div class="cnt-btn" onclick="coachSetCount('opp',1,this)">1</div>
+              <div class="cnt-btn" onclick="coachSetCount('opp',2,this)">2</div>
+              <div class="cnt-btn" onclick="coachSetCount('opp',3,this)">3</div>
+              <div class="cnt-btn" onclick="coachSetCount('opp',4,this)">4</div>
+              <div class="cnt-btn" onclick="coachSetCount('opp',5,this)">5</div>
+            </div>
+          </div>
+          <div style="border-radius:14px;overflow:hidden;background:#c8922a;margin-bottom:14px;border:0.5px solid var(--border);">
+            <canvas id="coach-preview" height="200" style="display:block;width:100%;"></canvas>
+          </div>
+          <button class="cta-btn" onclick="coachStartDesign()">Start designing →</button>
+        </div>
+        <!-- Designer canvas -->
+        <div id="coach-designer" style="display:none;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+            <span class="pd-badge pd-badge-blue" id="coach-mode-b">🔴 Recording</span>
+            <span class="pd-badge pd-badge-green" id="coach-steps-b">0 steps</span>
+            <span class="pd-badge pd-badge-amber" id="coach-setup-b"></span>
+            <button class="ch-btn" style="margin-left:auto;padding:5px 10px;font-size:11px;" onclick="coachGoSetup()">← Setup</button>
+          </div>
+          <div style="border-radius:16px;overflow:hidden;border:0.5px solid var(--border);background:#c8922a;touch-action:none;cursor:grab;">
+            <canvas id="coach-court" height="300" style="display:block;width:100%;"></canvas>
+          </div>
+          <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <button class="cta-btn" style="flex:none;width:auto;padding:9px 16px;font-size:13px;" onclick="coachSnapshot()">📸 Snapshot</button>
+              <button class="ch-btn" id="coach-undo-btn" onclick="coachUndo()" disabled style="padding:8px 14px;">↩ Undo</button>
+              <button class="ch-btn" style="padding:8px 14px;border-color:var(--red-light);color:var(--red);" onclick="coachClearAll()">✕ Clear</button>
+              <div style="flex:1;height:5px;background:var(--bg);border-radius:999px;overflow:hidden;min-width:40px;"><div id="coach-prog" style="height:100%;background:var(--brand);border-radius:999px;width:0%;transition:width .05s;"></div></div>
+            </div>
+            <div style="overflow-x:auto;padding-bottom:2px;"><div style="display:flex;gap:5px;min-width:max-content;" id="coach-timeline"></div></div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <button class="play-btn" id="coach-anim-btn" onclick="coachToggleAnim()" disabled>▶ Play</button>
+              <button class="reset-btn" id="coach-reset-btn" onclick="coachResetAnim()" disabled>↺</button>
+              <input class="name-input" id="coach-play-name" placeholder="Name this play..." maxlength="28" style="flex:1;min-width:80px;"/>
+              <button class="cta-btn" id="coach-save-btn" onclick="coachSavePlay()" disabled style="flex:none;width:auto;padding:9px 16px;font-size:13px;background:var(--green);">💾 Save</button>
+            </div>
+            <div id="coach-save-msg" style="font-size:13px;min-height:18px;font-weight:600;"></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-3);"><div style="width:8px;height:8px;border-radius:50%;background:#3b82f6;flex-shrink:0;"></div>Team</div>
+              <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-3);"><div style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0;"></div>Opponent</div>
+              <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-3);"><div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;flex-shrink:0;"></div>Ball</div>
+              <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-3);"><div style="width:8px;height:8px;border-radius:50%;border:1px dashed #aaa;flex-shrink:0;"></div>Ghost</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ S1: NAME ═══ -->
-<div id="s1" class="screen active">
+<div id="s1" class="screen">
   <div class="steps"><div class="sdot active"></div><div class="sdot"></div><div class="sdot"></div></div>
   <div class="ob">
     <div class="ob-hero">
-      <div class="trophy-wrap">
-        <span class="trophy-center">🏆</span>
-        <span class="orbit-ball o1" style="position:absolute;animation:spin 4s linear infinite reverse;">⚽</span>
-        <span class="orbit-ball o2" style="position:absolute;animation:spin 4s linear infinite reverse;animation-delay:-1.33s;">🏀</span>
-        <span class="orbit-ball o3" style="position:absolute;animation:spin 4s linear infinite reverse;animation-delay:-2.66s;">⚾</span>
-      </div>
-      <div class="ob-title">Sports Academy</div>
-      <div class="ob-sub">Learn sports like a pro. Let's set up your player profile!</div>
+      <div class="ob-title">What's your name?</div>
+      <div class="ob-sub">Every great athlete needs a great name!</div>
     </div>
     <div class="name-preview-box">
       <span class="name-preview-icon" id="np-icon">👤</span>
@@ -1106,7 +1260,285 @@ let pdKeyframes=[], pdDragging=null, pdDragOffX=0, pdDragOffY=0;
 let pdAnimating=false, pdAnimT=0, pdAnimRaf=null, pdAnimLastTs=null;
 let pdCanvasInited=false;
 
-// ── Supabase CRUD ──────────────────────────────────────────────────────
+// ── LANDING ────────────────────────────────────────────────────────────
+function chooseRole(role){
+  if(role==='player') show('s1');
+  else show('coach-screen');
+}
+
+// ── COACH PIN ──────────────────────────────────────────────────────────
+let coachPinVal='';
+function coachPin(k){
+  const err=document.getElementById('coach-pin-err');err.textContent='';
+  if(k==='del') coachPinVal=coachPinVal.slice(0,-1);
+  else if(k==='clr') coachPinVal='';
+  else if(coachPinVal.length<4) coachPinVal+=k;
+  for(let i=0;i<4;i++) document.getElementById('cp'+i).classList.toggle('filled',i<coachPinVal.length);
+  if(coachPinVal.length===4){
+    if(coachPinVal==='1234'){
+      document.getElementById('coach-lock').style.display='none';
+      document.getElementById('coach-hub').style.display='block';
+      coachLoadPlays();
+      coachDrawPreview();
+    } else {
+      err.textContent='Wrong PIN — try again!';
+      coachPinVal='';
+      for(let i=0;i<4;i++) document.getElementById('cp'+i).classList.remove('filled');
+    }
+  }
+}
+
+function coachLogout(){
+  document.getElementById('coach-hub').style.display='none';
+  document.getElementById('coach-lock').style.display='block';
+  coachPinVal='';
+  for(let i=0;i<4;i++) document.getElementById('cp'+i).classList.remove('filled');
+  show('landing');
+}
+
+function coachSwitch(pane,btn){
+  document.querySelectorAll('#coach-screen .pd-mtab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('#coach-screen .pd-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('coach-'+pane).classList.add('active');
+  if(pane==='playbook') coachLoadPlays();
+}
+
+// ── COACH DESIGNER STATE ───────────────────────────────────────────────
+let coachTeamCount=1, coachOppCount=0;
+let coachPlayers=[], coachBall={x:200,y:150};
+let coachKFs=[], coachDragging=null, coachDragOffX=0, coachDragOffY=0;
+let coachAnimating=false, coachAnimT=0, coachAnimRaf=null, coachAnimLastTs=null;
+let coachCanvasInited=false, coachSavedRafs={};
+
+function coachSetCount(team,n,btn){
+  if(team==='team') coachTeamCount=n; else coachOppCount=n;
+  document.getElementById('coach-'+team+'-counts').querySelectorAll('.cnt-btn').forEach(b=>{b.classList.remove('on','opp-on');});
+  btn.classList.add('on');
+  if(team==='opp') btn.classList.add('opp-on');
+  coachDrawPreview();
+}
+
+function coachBuildPlayers(){
+  coachPlayers=[];
+  const tx=[200,240,240,170,170],ty=[150,100,200,90,210];
+  const ox=[460,420,420,500,500],oy=[150,100,200,90,210];
+  for(let i=0;i<coachTeamCount;i++) coachPlayers.push({id:PD_TEAM_LABELS[i],team:'team',label:PD_TEAM_LABELS[i],x:tx[i]||200,y:ty[i]||150});
+  for(let i=0;i<coachOppCount;i++) coachPlayers.push({id:PD_OPP_LABELS[i],team:'opp',label:PD_OPP_LABELS[i],x:ox[i]||460,y:oy[i]||150});
+  coachBall={x:coachPlayers[0]?.x||200,y:coachPlayers[0]?.y||150};
+}
+
+function coachDrawPreview(){
+  const pc=document.getElementById('coach-preview');if(!pc) return;
+  pc.width=680;pc.height=200;const c=pc.getContext('2d');
+  pdDrawCourt(c,680,200);
+  const tx=[200,240,240,170,170],ty=[150,100,200,90,210];
+  const ox=[460,420,420,500,500],oy=[150,100,200,90,210];
+  const sy=200/300;
+  for(let i=0;i<coachTeamCount;i++) pdDrawPl(c,{team:'team',label:PD_TEAM_LABELS[i],x:tx[i],y:ty[i]*sy},1,false);
+  for(let i=0;i<coachOppCount;i++) pdDrawPl(c,{team:'opp',label:PD_OPP_LABELS[i],x:ox[i],y:oy[i]*sy},1,false);
+  pdDrawBl(c,{x:tx[0]||200,y:(ty[0]||150)*sy},1);
+}
+
+function coachStartDesign(){
+  coachBuildPlayers();coachKFs=[];
+  document.getElementById('coach-setup').style.display='none';
+  document.getElementById('coach-designer').style.display='block';
+  document.getElementById('coach-setup-b').textContent=coachTeamCount+'v'+coachOppCount;
+  setTimeout(()=>{coachInitCanvas();coachRender();},30);
+  coachUpdateBtns();
+}
+
+function coachGoSetup(){
+  coachStopAnim();
+  document.getElementById('coach-designer').style.display='none';
+  document.getElementById('coach-setup').style.display='block';
+  coachDrawPreview();
+}
+
+function coachInitCanvas(){
+  if(coachCanvasInited) return; coachCanvasInited=true;
+  const c=document.getElementById('coach-court');
+  c.width=680;c.height=300;
+  function getXY(e,touch){
+    const r=c.getBoundingClientRect();
+    if(touch){const t=e.touches[0];return{x:(t.clientX-r.left)*680/r.width,y:(t.clientY-r.top)*300/r.height};}
+    return{x:e.offsetX*(680/r.width),y:e.offsetY*(300/r.height)};
+  }
+  function hit(x,y){
+    if(Math.hypot(x-coachBall.x,y-coachBall.y)<12) return{type:'ball'};
+    for(let i=coachPlayers.length-1;i>=0;i--) if(Math.hypot(x-coachPlayers[i].x,y-coachPlayers[i].y)<16) return{type:'player',idx:i};
+    return null;
+  }
+  c.addEventListener('mousedown',e=>{if(coachAnimating)return;const p=getXY(e);const h=hit(p.x,p.y);if(h){coachDragging=h;coachDragOffX=h.type==='ball'?p.x-coachBall.x:p.x-coachPlayers[h.idx].x;coachDragOffY=h.type==='ball'?p.y-coachBall.y:p.y-coachPlayers[h.idx].y;}});
+  c.addEventListener('mousemove',e=>{if(!coachDragging||coachAnimating)return;const p=getXY(e);coachMoveItem(p);});
+  c.addEventListener('mouseup',()=>{coachDragging=null;});
+  c.addEventListener('mouseleave',()=>{coachDragging=null;});
+  c.addEventListener('touchstart',e=>{e.preventDefault();if(coachAnimating)return;const p=getXY(e,true);const h=hit(p.x,p.y);if(h){coachDragging=h;coachDragOffX=h.type==='ball'?p.x-coachBall.x:p.x-coachPlayers[h.idx].x;coachDragOffY=h.type==='ball'?p.y-coachBall.y:p.y-coachPlayers[h.idx].y;}},{passive:false});
+  c.addEventListener('touchmove',e=>{e.preventDefault();if(!coachDragging||coachAnimating)return;coachMoveItem(getXY(e,true));},{passive:false});
+  c.addEventListener('touchend',e=>{e.preventDefault();coachDragging=null;},{passive:false});
+}
+
+function coachMoveItem(p){
+  if(coachDragging.type==='ball'){coachBall.x=Math.max(10,Math.min(670,p.x-coachDragOffX));coachBall.y=Math.max(10,Math.min(290,p.y-coachDragOffY));}
+  else{coachPlayers[coachDragging.idx].x=Math.max(10,Math.min(670,p.x-coachDragOffX));coachPlayers[coachDragging.idx].y=Math.max(10,Math.min(290,p.y-coachDragOffY));}
+  coachRender();
+}
+
+function coachRender(){
+  const c=document.getElementById('coach-court');if(!c) return;
+  const ctx=c.getContext('2d');ctx.clearRect(0,0,680,300);
+  pdDrawCourt(ctx,680,300);
+  if(coachKFs.length>0){const prev=coachKFs[coachKFs.length-1];prev.players.forEach(p=>pdDrawPl(ctx,p,.22,true));}
+  // trails
+  if(coachKFs.length>1){
+    coachPlayers.forEach(p=>{
+      const trail=coachKFs.map(kf=>kf.players.find(pl=>pl.id===p.id)).filter(Boolean);
+      if(trail.length>1){ctx.save();ctx.strokeStyle=p.team==='team'?'rgba(59,130,246,.25)':'rgba(239,68,68,.25)';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(trail[0].x,trail[0].y);trail.forEach(pt=>ctx.lineTo(pt.x,pt.y));ctx.stroke();ctx.restore();}
+    });
+  }
+  coachPlayers.forEach(p=>pdDrawPl(ctx,p,1,false));
+  pdDrawBl(ctx,coachBall,1);
+}
+
+function coachSnapshot(){
+  coachKFs.push({players:coachPlayers.map(p=>({...p})),ball:{...coachBall}});
+  coachUpdateTimeline();coachUpdateBtns();coachRender();
+}
+
+function coachUndo(){if(coachKFs.length>0){coachKFs.pop();coachUpdateTimeline();coachUpdateBtns();coachRender();}}
+
+function coachClearAll(){coachKFs=[];coachBuildPlayers();coachStopAnim();coachUpdateTimeline();coachUpdateBtns();coachRender();}
+
+function coachUpdateTimeline(){
+  document.getElementById('coach-timeline').innerHTML=coachKFs.map((kf,i)=>`
+    <div class="kf-chip" onclick="coachJumpKF(${i})">
+      <div class="kf-num">Step ${i+1}</div>
+      <div class="kf-dots">${kf.players.map(p=>`<div class="kf-dot" style="background:${p.team==='team'?'#3b82f6':'#ef4444'}"></div>`).join('')}<div class="kf-dot" style="background:#f59e0b"></div></div>
+    </div>`).join('');
+  document.getElementById('coach-steps-b').textContent=coachKFs.length+' step'+(coachKFs.length!==1?'s':'');
+}
+
+function coachJumpKF(i){
+  if(coachAnimating) return;
+  const kf=coachKFs[i];coachPlayers=kf.players.map(p=>({...p}));coachBall={...kf.ball};
+  document.querySelectorAll('#coach-timeline .kf-chip').forEach((c,ci)=>c.classList.toggle('active',ci===i));
+  coachRender();
+}
+
+function coachUpdateBtns(){
+  const has=coachKFs.length>0,has2=coachKFs.length>1;
+  document.getElementById('coach-undo-btn').disabled=!has;
+  document.getElementById('coach-anim-btn').disabled=!has2;
+  document.getElementById('coach-reset-btn').disabled=!has2;
+  document.getElementById('coach-save-btn').disabled=!has2;
+}
+
+function coachToggleAnim(){coachAnimating?coachStopAnim():coachStartAnim();}
+
+function coachStartAnim(){
+  if(coachKFs.length<2) return;
+  coachAnimating=true;coachAnimT=0;coachAnimLastTs=null;
+  document.getElementById('coach-anim-btn').textContent='⏸ Pause';
+  document.getElementById('coach-mode-b').textContent='▶ Playing';
+  const c=document.getElementById('coach-court').getContext('2d');
+  function frame(ts){
+    if(!coachAnimLastTs) coachAnimLastTs=ts;
+    const dt=(ts-coachAnimLastTs)/1000;coachAnimLastTs=ts;
+    coachAnimT=Math.min(coachAnimT+dt*.28,1);
+    pdRenderAnimFrame(c,coachKFs,coachAnimT);
+    document.getElementById('coach-prog').style.width=(coachAnimT*100).toFixed(1)+'%';
+    if(coachAnimT<1) coachAnimRaf=requestAnimationFrame(frame);
+    else{coachAnimating=false;document.getElementById('coach-anim-btn').textContent='↺ Replay';document.getElementById('coach-mode-b').textContent='✅ Done';}
+  }
+  coachAnimRaf=requestAnimationFrame(frame);
+}
+
+function coachStopAnim(){
+  coachAnimating=false;cancelAnimationFrame(coachAnimRaf);coachAnimLastTs=null;
+  document.getElementById('coach-anim-btn').textContent='▶ Play';
+  document.getElementById('coach-mode-b').textContent='🔴 Recording';
+  coachRender();
+}
+
+function coachResetAnim(){
+  coachStopAnim();coachAnimT=0;
+  document.getElementById('coach-prog').style.width='0%';
+  if(coachKFs.length>0) coachJumpKF(0); else coachRender();
+}
+
+async function coachSavePlay(){
+  const name=document.getElementById('coach-play-name').value.trim();
+  const msg=document.getElementById('coach-save-msg');
+  if(!name){msg.textContent='Give the play a name!';msg.style.color='var(--red)';return;}
+  if(coachKFs.length<2){msg.textContent='Record at least 2 steps!';msg.style.color='var(--red)';return;}
+  msg.textContent='Saving...';msg.style.color='var(--text-2)';
+  const play={name,keyframes:JSON.parse(JSON.stringify(coachKFs)),teamCount:coachTeamCount,oppCount:coachOppCount,ratings:[]};
+  await pdPersistNew(play);
+  msg.textContent='✓ Saved to playbook!';msg.style.color='var(--green)';
+  document.getElementById('coach-play-name').value='';
+  setTimeout(()=>msg.textContent='',3000);
+}
+
+// ── COACH PLAYBOOK ─────────────────────────────────────────────────────
+async function coachLoadPlays(){
+  document.getElementById('coach-plays-list').innerHTML='<div class="pd-empty">Loading...</div>';
+  try{const data=await sbFetch('plays?order=created_at.desc&select=*');pdSavedPlays=data||[];}catch(e){pdSavedPlays=[];}
+  coachRenderList();
+}
+
+function coachRenderList(){
+  const list=document.getElementById('coach-plays-list');
+  document.getElementById('coach-plays-ct').textContent=pdSavedPlays.length+' play'+(pdSavedPlays.length!==1?'s':'');
+  if(!pdSavedPlays.length){list.innerHTML='<div class="pd-empty">No plays yet — design one!</div>';return;}
+  list.innerHTML=pdSavedPlays.map(play=>`
+    <div class="pd-play-card" id="cpc${play.id}">
+      <div class="pd-play-hdr" onclick="coachTogglePlay(${play.id})">
+        <div>
+          <div class="pd-play-title">${play.name}</div>
+          <div class="pd-play-meta">${play.keyframes.length} steps · ${play.team_count||play.teamCount}v${play.opp_count||play.oppCount}</div>
+        </div>
+        <span class="pd-play-chev">›</span>
+      </div>
+      <div class="pd-play-body">
+        <div class="pd-viewer-wrap"><canvas id="cvc${play.id}" height="300" style="display:block;width:100%;"></canvas></div>
+        <div class="pd-actions" style="margin-top:8px;">
+          <button class="pd-anim-btn" onclick="coachPlayAnim(${play.id})">▶ Animate</button>
+          <button class="pd-del-btn" onclick="coachDelPlay(${play.id})">Delete</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function coachTogglePlay(id){
+  const card=document.getElementById('cpc'+id);
+  const wasOpen=card.classList.contains('open');
+  document.querySelectorAll('.pd-play-card').forEach(c=>c.classList.remove('open'));
+  if(!wasOpen){card.classList.add('open');setTimeout(()=>{
+    const play=pdSavedPlays.find(p=>p.id===id);if(!play) return;
+    const vc=document.getElementById('cvc'+id);if(!vc) return;
+    vc.width=680;vc.height=300;const c=vc.getContext('2d');
+    pdDrawCourt(c,680,300);
+    play.keyframes[0].players.forEach(p=>pdDrawPl(c,p,1,false));
+    pdDrawBl(c,play.keyframes[0].ball,1);
+  },40);}
+}
+
+function coachPlayAnim(id){
+  const play=pdSavedPlays.find(p=>p.id===id);if(!play||play.keyframes.length<2) return;
+  const vc=document.getElementById('cvc'+id);if(!vc) return;
+  vc.width=680;vc.height=300;const c=vc.getContext('2d');
+  if(coachSavedRafs[id]) cancelAnimationFrame(coachSavedRafs[id]);
+  let t=0,last=null;
+  function frame(ts){if(!last)last=ts;t=Math.min(t+(ts-last)/1000*.28,1);last=ts;pdRenderAnimFrame(c,play.keyframes,t);if(t<1)coachSavedRafs[id]=requestAnimationFrame(frame);}
+  coachSavedRafs[id]=requestAnimationFrame(frame);
+}
+
+async function coachDelPlay(id){
+  await pdDeleteFromDB(id);
+  pdSavedPlays=pdSavedPlays.filter(p=>p.id!==id);
+  coachRenderList();
+}
 async function pdLoadPlays(){
   document.getElementById('pd-plays-list').innerHTML='<div class="pd-empty">Loading plays...</div>';
   try{
