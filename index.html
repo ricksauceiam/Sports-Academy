@@ -330,7 +330,28 @@ body {
 .ch-btn:hover { background: var(--brand); color: #fff; }
 .ch-btn.done { background: var(--green-light); border-color: var(--green); color: #27500A; }
 
-/* PLAY DESIGNER */
+/* PLAY DESIGNER SETUP */
+.setup-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.setup-lbl{font-size:13px;font-weight:700;font-family:var(--font);min-width:100px;}
+.count-btns{display:flex;gap:6px;}
+.cnt-btn{width:36px;height:36px;border-radius:10px;border:1.5px solid var(--border-2);background:var(--bg);color:var(--text);font-size:14px;font-family:var(--font);font-weight:700;cursor:pointer;text-align:center;line-height:34px;transition:all .13s;}
+.cnt-btn.on{background:#3b82f6;color:#fff;border-color:#3b82f6;}
+.cnt-btn.opp-on{background:#ef4444;border-color:#ef4444;}
+.pd-badge{font-size:12px;font-weight:700;font-family:var(--font);padding:4px 12px;border-radius:999px;}
+.pd-badge-blue{background:var(--brand-light);color:var(--brand-dark);}
+.pd-badge-green{background:var(--green-light);color:#27500A;}
+.pd-badge-amber{background:var(--amber-light);color:#633806;}
+.kf-chip{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 8px;border-radius:8px;border:0.5px solid var(--border);background:var(--bg);transition:all .13s;min-width:42px;}
+.kf-chip.active{background:var(--brand-light);border-color:var(--brand);}
+.kf-chip.playing-kf{background:var(--green-light);border-color:var(--green);}
+.kf-num{font-size:10px;font-weight:600;color:var(--text-3);font-family:var(--font);}
+.kf-dots{display:flex;gap:2px;}
+.kf-dot{width:6px;height:6px;border-radius:50%;}
+.pd-badge-amber:empty{display:none;}
+.name-input{padding:8px 12px;border-radius:10px;border:0.5px solid var(--border-2);background:var(--bg);color:var(--text);font-size:13px;font-family:var(--font);outline:none;}
+.name-input:focus{border-color:var(--brand);background:var(--card);}
+
+/* PLAY DESIGNER VIEWER */
 .pd-mode-tabs{display:flex;gap:8px;margin-bottom:12px;}
 .pd-mtab{flex:1;padding:9px;border-radius:12px;border:1.5px solid var(--border-2);background:var(--bg);color:var(--text-2);font-size:13px;font-family:var(--font);font-weight:700;cursor:pointer;text-align:center;transition:all .15s;}
 .pd-mtab.on{background:var(--brand);color:#fff;border-color:var(--brand);}
@@ -574,21 +595,22 @@ body {
   <!-- PLAY DESIGNER -->
   <div id="designer" class="section">
     <div class="pd-mode-tabs">
-      <div class="pd-mtab on" id="pd-view-tab" onclick="pdSwitch('view',this)">📋 Playbook</div>
-      <div class="pd-mtab" id="pd-admin-tab" onclick="pdSwitch('admin',this)">🔒 Coach mode</div>
+      <div class="pd-mtab on" onclick="pdSwitch('view',this)">📋 Playbook</div>
+      <div class="pd-mtab" onclick="pdSwitch('coach',this)">🔒 Coach mode</div>
     </div>
 
     <!-- VIEWER -->
     <div id="pd-view" class="pd-pane active">
       <div class="plays-hdr">
         <div class="plays-hdr-title">Coach's playbook</div>
-        <div class="plays-ct-badge" id="pd-plays-ct">0 plays</div>
+        <div class="plays-ct-badge" id="pd-plays-ct">Loading...</div>
       </div>
-      <div id="pd-plays-list"></div>
+      <div id="pd-plays-list"><div class="pd-empty">Loading plays...</div></div>
     </div>
 
-    <!-- ADMIN -->
-    <div id="pd-admin" class="pd-pane">
+    <!-- COACH -->
+    <div id="pd-coach" class="pd-pane">
+      <!-- PIN -->
       <div id="pd-lock" class="admin-lock">
         <div class="lock-icon">🔐</div>
         <div class="lock-title">Coach access</div>
@@ -605,24 +627,70 @@ body {
         </div>
         <div class="pin-err" id="pd-pin-err"></div>
       </div>
-      <div id="pd-designer-wrap" style="display:none;">
-        <div class="d-tip" id="pd-tip">Tap to place team players (blue) on the court</div>
-        <div class="d-toolbar">
-          <div class="tool-btn on" onclick="pdTool('team',this)">🔵 Team</div>
-          <div class="tool-btn" onclick="pdTool('opp',this)">🔴 Opp</div>
-          <div class="tool-btn" onclick="pdTool('run',this)">➡ Run</div>
-          <div class="tool-btn" onclick="pdTool('pass',this)">🏀 Pass</div>
-          <div class="tool-btn" onclick="pdTool('erase',this)">🗑 Erase</div>
+
+      <!-- SETUP -->
+      <div id="pd-setup" style="display:none;">
+        <div class="lock-title" style="margin-bottom:14px;">Set up your play</div>
+        <div class="setup-row">
+          <div class="setup-lbl" style="color:#3b82f6;">🔵 Team players</div>
+          <div class="count-btns" id="pd-team-counts">
+            <div class="cnt-btn on" onclick="pdSetCount('team',1,this)">1</div>
+            <div class="cnt-btn" onclick="pdSetCount('team',2,this)">2</div>
+            <div class="cnt-btn" onclick="pdSetCount('team',3,this)">3</div>
+            <div class="cnt-btn" onclick="pdSetCount('team',4,this)">4</div>
+            <div class="cnt-btn" onclick="pdSetCount('team',5,this)">5</div>
+          </div>
         </div>
-        <div class="design-court-wrap">
-          <canvas id="pd-canvas" height="300"></canvas>
+        <div class="setup-row">
+          <div class="setup-lbl" style="color:#ef4444;">🔴 Opponents</div>
+          <div class="count-btns" id="pd-opp-counts">
+            <div class="cnt-btn on opp-on" onclick="pdSetCount('opp',0,this)">0</div>
+            <div class="cnt-btn" onclick="pdSetCount('opp',1,this)">1</div>
+            <div class="cnt-btn" onclick="pdSetCount('opp',2,this)">2</div>
+            <div class="cnt-btn" onclick="pdSetCount('opp',3,this)">3</div>
+            <div class="cnt-btn" onclick="pdSetCount('opp',4,this)">4</div>
+            <div class="cnt-btn" onclick="pdSetCount('opp',5,this)">5</div>
+          </div>
         </div>
-        <div class="d-bottom">
-          <input class="pd-name-input" id="pd-play-name" placeholder="Name this play..." maxlength="30"/>
-          <button class="pd-save-btn" onclick="pdSave()">💾 Save</button>
-          <button class="pd-clear-btn" onclick="pdClear()">↺</button>
+        <div style="border-radius:14px;overflow:hidden;background:#c8922a;margin-bottom:14px;border:0.5px solid var(--border);">
+          <canvas id="pd-preview" height="200" style="display:block;width:100%;"></canvas>
         </div>
-        <div class="pd-save-msg" id="pd-save-msg"></div>
+        <button class="cta-btn" onclick="pdStartDesign()">Start designing →</button>
+      </div>
+
+      <!-- DESIGNER -->
+      <div id="pd-designer" style="display:none;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+          <span class="pd-badge pd-badge-blue" id="pd-mode-b">🔴 Recording</span>
+          <span class="pd-badge pd-badge-green" id="pd-steps-b">0 steps</span>
+          <span class="pd-badge pd-badge-amber" id="pd-setup-b"></span>
+          <button class="ch-btn" style="margin-left:auto;padding:5px 10px;font-size:11px;" onclick="pdGoSetup()">← Setup</button>
+        </div>
+        <div style="border-radius:16px;overflow:hidden;border:0.5px solid var(--border);background:#c8922a;touch-action:none;cursor:grab;">
+          <canvas id="pd-court" height="300" style="display:block;width:100%;"></canvas>
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <button class="cta-btn" style="flex:none;width:auto;padding:9px 16px;font-size:13px;" onclick="pdSnapshot()">📸 Snapshot</button>
+            <button class="ch-btn" id="pd-undo-btn" onclick="pdUndo()" disabled style="padding:8px 14px;">↩ Undo</button>
+            <button class="ch-btn" style="padding:8px 14px;border-color:var(--red-light);color:var(--red);" onclick="pdClearAll()">✕ Clear</button>
+            <div style="flex:1;height:5px;background:var(--bg);border-radius:999px;overflow:hidden;min-width:40px;"><div id="pd-prog" style="height:100%;background:var(--brand);border-radius:999px;width:0%;transition:width .05s;"></div></div>
+          </div>
+          <div style="overflow-x:auto;padding-bottom:2px;"><div style="display:flex;gap:5px;min-width:max-content;" id="pd-timeline"></div></div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <button class="play-btn" id="pd-anim-btn" onclick="pdToggleAnim()" disabled>▶ Play</button>
+            <button class="reset-btn" id="pd-reset-btn" onclick="pdResetAnim()" disabled>↺</button>
+            <input class="name-input" id="pd-play-name" placeholder="Name this play..." maxlength="28" style="flex:1;min-width:80px;"/>
+            <button class="cta-btn" id="pd-save-btn" onclick="pdSavePlay()" disabled style="flex:none;width:auto;padding:9px 16px;font-size:13px;background:var(--green);">💾 Save</button>
+          </div>
+          <div id="pd-save-msg" style="font-size:13px;min-height:18px;font-weight:600;"></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-3);"><div style="width:8px;height:8px;border-radius:50%;background:#3b82f6;"></div>Team</div>
+            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-3);"><div style="width:8px;height:8px;border-radius:50%;background:#ef4444;"></div>Opponent</div>
+            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-3);"><div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;"></div>Ball</div>
+            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-3);"><div style="width:8px;height:8px;border-radius:50%;border:1px dashed #aaa;"></div>Ghost</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1006,33 +1074,73 @@ function confetti(){
 }
 
 
-// ── PLAY DESIGNER ─────────────────────────────────────────────────────
-const ADMIN_PIN='1234';
-let pdPin_val='',pdTool_val='team',pdElements=[],pdDrawing=false,pdPath=[],pdSavedPlays=[],pdAnimStates={};
-let pdInited=false;
+// ── PLAY DESIGNER (Supabase-backed sequenced) ─────────────────────────
+const SUPA_URL='https://aqmaicoymndgqgaifzqf.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxbWFpY295bW5kZ3FnYWlmenFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1Mjg0NzIsImV4cCI6MjA5MTEwNDQ3Mn0.DeLdxwL-SdEdKEDwGSbfJHS4TsUyLDkbBTcwx7TwiDk';
 
+async function sbFetch(path,opts={}){
+  const res=await fetch(SUPA_URL+'/rest/v1/'+path,{
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation',...(opts.headers||{})},
+    ...opts
+  });
+  if(!res.ok){const e=await res.text();throw new Error(e);}
+  const txt=await res.text();
+  return txt?JSON.parse(txt):null;
+}
+
+const ADMIN_PIN='1234';
 const PD_POSITIONS={
   PG:{title:'Point Guard',desc:'You are the floor general! Bring the ball up, call the play, and find open teammates. Make smart decisions and control the tempo.'},
-  SG:{title:'Shooting Guard',desc:'You are the scorer! Look for open shots off screens and cuts. Stay ready — the pass could come to you for a quick shot at any moment.'},
-  SF:{title:'Small Forward',desc:'You are the versatile attacker! You can drive to the basket or pop out for a jump shot. Read the defense and pick your moment.'},
-  PF:{title:'Power Forward',desc:'You are the inside presence! Set strong screens to free up teammates. After the screen, roll hard to the basket for an easy finish.'},
-  C:{title:'Center',desc:'You are the anchor! Stay near the basket, set big screens, and look for the easy pass inside. Your size creates space for everyone.'},
+  SG:{title:'Shooting Guard',desc:'You are the scorer! Look for open shots off screens and cuts. Stay ready — the pass could come to you at any moment.'},
+  SF:{title:'Small Forward',desc:'You are versatile — drive or shoot depending on what the defense gives you. Cut hard at the right moment.'},
+  PF:{title:'Power Forward',desc:'Set strong screens and roll to the basket after. Your movement creates space for the guards and opens up the lane.'},
+  C:{title:'Center',desc:'Stay near the basket, set big screens, and look for the easy pass inside. Your size creates space for everyone.'},
 };
+const PD_TEAM_LABELS=['PG','SG','SF','PF','C'];
+const PD_OPP_LABELS=['D1','D2','D3','D4','D5'];
 
+let pdPin_val='', pdSavedPlays=[], pdOpenPlay=null, pdSavedAnimRafs={};
+let pdTeamCount=1, pdOppCount=0;
+let pdPlayers=[], pdBall={x:200,y:150};
+let pdKeyframes=[], pdDragging=null, pdDragOffX=0, pdDragOffY=0;
+let pdAnimating=false, pdAnimT=0, pdAnimRaf=null, pdAnimLastTs=null;
+let pdCanvasInited=false;
+
+// ── Supabase CRUD ──────────────────────────────────────────────────────
 async function pdLoadPlays(){
-  try{const r=await window.storage.get('coach-plays');if(r&&r.value)pdSavedPlays=JSON.parse(r.value);}catch(e){pdSavedPlays=[];}
+  document.getElementById('pd-plays-list').innerHTML='<div class="pd-empty">Loading plays...</div>';
+  try{
+    const data=await sbFetch('plays?order=created_at.desc&select=*');
+    pdSavedPlays=data||[];
+  }catch(e){pdSavedPlays=[];}
   pdRenderList();
 }
-async function pdPersist(){try{await window.storage.set('coach-plays',JSON.stringify(pdSavedPlays));}catch(e){}}
 
+async function pdPersistNew(play){
+  try{
+    const data=await sbFetch('plays',{method:'POST',body:JSON.stringify({name:play.name,keyframes:play.keyframes,team_count:play.teamCount,opp_count:play.oppCount,ratings:play.ratings})});
+    if(data&&data[0]) play.id=data[0].id;
+  }catch(e){console.error('Save error',e);}
+}
+
+async function pdPersistRating(id,ratings){
+  try{await sbFetch('plays?id=eq.'+id,{method:'PATCH',body:JSON.stringify({ratings})});}catch(e){}
+}
+
+async function pdDeleteFromDB(id){
+  try{await sbFetch('plays?id=eq.'+id,{method:'DELETE',headers:{'Prefer':''}});}catch(e){}
+}
+
+// ── Mode switching ─────────────────────────────────────────────────────
 function pdSwitch(mode,btn){
   document.querySelectorAll('.pd-mtab').forEach(t=>t.classList.remove('on'));
   btn.classList.add('on');
   document.querySelectorAll('.pd-pane').forEach(p=>p.classList.remove('active'));
   document.getElementById('pd-'+mode).classList.add('active');
-  if(mode==='view') pdRenderList();
+  if(mode==='view') pdLoadPlays();
 }
 
+// ── PIN ────────────────────────────────────────────────────────────────
 function pdPin(k){
   const err=document.getElementById('pd-pin-err');err.textContent='';
   if(k==='del') pdPin_val=pdPin_val.slice(0,-1);
@@ -1042,8 +1150,8 @@ function pdPin(k){
   if(pdPin_val.length===4){
     if(pdPin_val===ADMIN_PIN){
       document.getElementById('pd-lock').style.display='none';
-      document.getElementById('pd-designer-wrap').style.display='block';
-      pdInitCanvas();
+      document.getElementById('pd-setup').style.display='block';
+      pdDrawPreview();
     } else {
       err.textContent='Wrong PIN — try again!';
       pdPin_val='';
@@ -1052,229 +1160,331 @@ function pdPin(k){
   }
 }
 
+// ── Setup / Preview ────────────────────────────────────────────────────
+function pdSetCount(team,n,btn){
+  if(team==='team') pdTeamCount=n; else pdOppCount=n;
+  document.getElementById('pd-'+team+'-counts').querySelectorAll('.cnt-btn').forEach(b=>{
+    b.classList.remove('on','opp-on');
+  });
+  btn.classList.add('on');
+  if(team==='opp') btn.classList.add('opp-on');
+  pdDrawPreview();
+}
+
+function pdBuildPlayers(){
+  pdPlayers=[];
+  const tx=[200,240,240,170,170],ty=[150,100,200,90,210];
+  const ox=[460,420,420,500,500],oy=[150,100,200,90,210];
+  for(let i=0;i<pdTeamCount;i++) pdPlayers.push({id:PD_TEAM_LABELS[i],team:'team',label:PD_TEAM_LABELS[i],x:tx[i]||200,y:ty[i]||150});
+  for(let i=0;i<pdOppCount;i++) pdPlayers.push({id:PD_OPP_LABELS[i],team:'opp',label:PD_OPP_LABELS[i],x:ox[i]||460,y:oy[i]||150});
+  pdBall={x:pdPlayers[0]?.x||200,y:pdPlayers[0]?.y||150};
+}
+
+function pdDrawPreview(){
+  const pc=document.getElementById('pd-preview');if(!pc) return;
+  pc.width=680;pc.height=200;const c=pc.getContext('2d');
+  pdDrawCourt(c,680,200);
+  const tx=[200,240,240,170,170],ty=[150,100,200,90,210];
+  const ox=[460,420,420,500,500],oy=[150,100,200,90,210];
+  const sy=200/300;
+  for(let i=0;i<pdTeamCount;i++) pdDrawPl(c,{team:'team',label:PD_TEAM_LABELS[i],x:tx[i],y:ty[i]*sy},1,false);
+  for(let i=0;i<pdOppCount;i++) pdDrawPl(c,{team:'opp',label:PD_OPP_LABELS[i],x:ox[i],y:oy[i]*sy},1,false);
+  pdDrawBl(c,{x:tx[0]||200,y:(ty[0]||150)*sy},1);
+}
+
+function pdStartDesign(){
+  pdBuildPlayers();
+  pdKeyframes=[];
+  document.getElementById('pd-setup').style.display='none';
+  document.getElementById('pd-designer').style.display='block';
+  document.getElementById('pd-setup-b').textContent=pdTeamCount+'v'+pdOppCount;
+  setTimeout(()=>{pdInitCanvas();pdRender();},30);
+  pdUpdateBtns();
+}
+
+function pdGoSetup(){
+  pdStopAnim();
+  document.getElementById('pd-designer').style.display='none';
+  document.getElementById('pd-setup').style.display='block';
+  pdDrawPreview();
+}
+
+// ── Canvas init ────────────────────────────────────────────────────────
 function pdInitCanvas(){
-  if(pdInited) return; pdInited=true;
-  const c=document.getElementById('pd-canvas');
+  if(pdCanvasInited) return; pdCanvasInited=true;
+  const c=document.getElementById('pd-court');
   c.width=680;c.height=300;
-  const getXY=(e,isTouch)=>{
+  function getXY(e,touch){
     const r=c.getBoundingClientRect();
-    if(isTouch){const t=e.touches[0];return{x:(t.clientX-r.left)*680/r.width,y:(t.clientY-r.top)*300/r.height};}
+    if(touch){const t=e.touches[0];return{x:(t.clientX-r.left)*680/r.width,y:(t.clientY-r.top)*300/r.height};}
     return{x:e.offsetX*(680/r.width),y:e.offsetY*(300/r.height)};
-  };
-  c.addEventListener('mousedown',e=>pdStart(getXY(e)));
-  c.addEventListener('mousemove',e=>{if(pdDrawing)pdMove(getXY(e));});
-  c.addEventListener('mouseup',()=>pdEnd());
-  c.addEventListener('touchstart',e=>{e.preventDefault();pdStart(getXY(e,true));},{passive:false});
-  c.addEventListener('touchmove',e=>{e.preventDefault();if(pdDrawing)pdMove(getXY(e,true));},{passive:false});
-  c.addEventListener('touchend',e=>{e.preventDefault();pdEnd();},{passive:false});
-  pdRedraw();
-}
-
-function pdTool(t,btn){
-  pdTool_val=t;
-  document.querySelectorAll('.d-toolbar .tool-btn').forEach(b=>{b.classList.remove('on','on-red','on-green','on-amber');});
-  const cls=t==='opp'?'on-red':t==='run'?'on-green':t==='pass'?'on-amber':'on';
-  btn.classList.add(cls);
-  const tips={team:'Tap to place a team player (blue). Tap again to remove.',opp:'Tap to place an opponent (red). Max 5 each.',run:'Drag to draw a run path (dashed white line).',pass:'Drag to draw a pass line (gold arrow).',erase:'Tap any player or line to remove it.'};
-  document.getElementById('pd-tip').textContent=tips[t];
-}
-
-function pdDistSeg(p,a,b){
-  const dx=b.x-a.x,dy=b.y-a.y;
-  if(!dx&&!dy) return Math.hypot(p.x-a.x,p.y-a.y);
-  const t=Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/(dx*dx+dy*dy)));
-  return Math.hypot(p.x-(a.x+t*dx),p.y-(a.y+t*dy));
-}
-
-function pdStart(p){
-  pdDrawing=true;
-  if(pdTool_val==='team'||pdTool_val==='opp'){
-    const ei=pdElements.findIndex(e=>e.type==='player'&&Math.hypot(e.x-p.x,e.y-p.y)<18);
-    if(ei>=0){pdElements.splice(ei,1);}
-    else{
-      const lbls=['PG','SG','SF','PF','C'];
-      const tc=pdElements.filter(e=>e.type==='player'&&e.team==='team').length;
-      const oc=pdElements.filter(e=>e.type==='player'&&e.team==='opp').length;
-      if(pdTool_val==='team'&&tc>=5||pdTool_val==='opp'&&oc>=5) return;
-      pdElements.push({type:'player',team:pdTool_val,x:p.x,y:p.y,label:pdTool_val==='team'?lbls[tc]:'D'+(oc+1)});
-    }
-    pdRedraw();
-  } else if(pdTool_val==='run'||pdTool_val==='pass'){
-    pdPath=[p];
-  } else if(pdTool_val==='erase'){
-    const ei=pdElements.findIndex(e=>{
-      if(e.type==='player') return Math.hypot(e.x-p.x,e.y-p.y)<18;
-      if(e.type==='path') return e.points.some((_,i,a)=>i>0&&pdDistSeg(p,a[i-1],a[i])<12);
-      return false;
-    });
-    if(ei>=0){pdElements.splice(ei,1);pdRedraw();}
   }
+  c.addEventListener('mousedown',e=>{if(pdAnimating)return;const p=getXY(e);const h=pdHit(p.x,p.y);if(h){pdDragging=h;pdDragOffX=h.type==='ball'?p.x-pdBall.x:p.x-pdPlayers[h.idx].x;pdDragOffY=h.type==='ball'?p.y-pdBall.y:p.y-pdPlayers[h.idx].y;}});
+  c.addEventListener('mousemove',e=>{if(!pdDragging||pdAnimating)return;pdMoveItem(getXY(e));});
+  c.addEventListener('mouseup',()=>{pdDragging=null;});
+  c.addEventListener('mouseleave',()=>{pdDragging=null;});
+  c.addEventListener('touchstart',e=>{e.preventDefault();if(pdAnimating)return;const p=getXY(e,true);const h=pdHit(p.x,p.y);if(h){pdDragging=h;pdDragOffX=h.type==='ball'?p.x-pdBall.x:p.x-pdPlayers[h.idx].x;pdDragOffY=h.type==='ball'?p.y-pdBall.y:p.y-pdPlayers[h.idx].y;}},{passive:false});
+  c.addEventListener('touchmove',e=>{e.preventDefault();if(!pdDragging||pdAnimating)return;pdMoveItem(getXY(e,true));},{passive:false});
+  c.addEventListener('touchend',e=>{e.preventDefault();pdDragging=null;},{passive:false});
 }
 
-function pdMove(p){
-  if(pdTool_val==='run'||pdTool_val==='pass'){pdPath.push(p);pdRedraw();pdDrawPath();}
+function pdHit(x,y){
+  if(Math.hypot(x-pdBall.x,y-pdBall.y)<12) return{type:'ball'};
+  for(let i=pdPlayers.length-1;i>=0;i--) if(Math.hypot(x-pdPlayers[i].x,y-pdPlayers[i].y)<16) return{type:'player',idx:i};
+  return null;
 }
 
-function pdEnd(){
-  pdDrawing=false;
-  if((pdTool_val==='run'||pdTool_val==='pass')&&pdPath.length>3){
-    pdElements.push({type:'path',style:pdTool_val,points:[...pdPath]});
-  }
-  pdPath=[];pdRedraw();
+function pdMoveItem(p){
+  if(pdDragging.type==='ball'){pdBall.x=Math.max(10,Math.min(670,p.x-pdDragOffX));pdBall.y=Math.max(10,Math.min(290,p.y-pdDragOffY));}
+  else{pdPlayers[pdDragging.idx].x=Math.max(10,Math.min(670,p.x-pdDragOffX));pdPlayers[pdDragging.idx].y=Math.max(10,Math.min(290,p.y-pdDragOffY));}
+  pdRender();
 }
 
-function pdDrawBball(ctx,w,h){
+// ── Draw helpers ───────────────────────────────────────────────────────
+function pdDrawCourt(c,w,h){
   const sx=w/680,sy=h/300;
-  ctx.fillStyle='#c8922a';ctx.fillRect(0,0,w,h);
-  ctx.strokeStyle='rgba(255,255,255,0.5)';ctx.lineWidth=1.5;
-  ctx.strokeRect(20*sx,18*sy,640*sx,264*sy);
-  ctx.beginPath();ctx.moveTo(340*sx,18*sy);ctx.lineTo(340*sx,282*sy);ctx.stroke();
-  ctx.beginPath();ctx.arc(340*sx,150*sy,48*sx,0,Math.PI*2);ctx.stroke();
-  ctx.strokeRect(530*sx,74*sy,130*sx,152*sy);ctx.strokeRect(20*sx,74*sy,130*sx,152*sy);
-  ctx.beginPath();ctx.arc(595*sx,150*sy,56*sx,Math.PI*0.5,Math.PI*1.5);ctx.stroke();
-  ctx.beginPath();ctx.arc(85*sx,150*sy,56*sx,Math.PI*1.5,Math.PI*0.5);ctx.stroke();
+  c.fillStyle='#c8922a';c.fillRect(0,0,w,h);
+  c.strokeStyle='rgba(255,255,255,0.45)';c.lineWidth=1.5;
+  c.strokeRect(20*sx,18*sy,640*sx,264*sy);
+  c.beginPath();c.moveTo(340*sx,18*sy);c.lineTo(340*sx,282*sy);c.stroke();
+  c.beginPath();c.arc(340*sx,150*sy,48*sx,0,Math.PI*2);c.stroke();
+  c.strokeRect(530*sx,74*sy,130*sx,152*sy);c.strokeRect(20*sx,74*sy,130*sx,152*sy);
+  c.beginPath();c.arc(595*sx,150*sy,56*sx,Math.PI*.5,Math.PI*1.5);c.stroke();
+  c.beginPath();c.arc(85*sx,150*sy,56*sx,Math.PI*1.5,Math.PI*.5);c.stroke();
 }
 
-function pdDrawPlayer(ctx,el,sx,sy,hi){
-  const x=el.x*sx,y=el.y*sy,color=el.team==='team'?'#3b82f6':'#ef4444';
-  ctx.save();
-  if(hi){ctx.shadowColor=color;ctx.shadowBlur=14;}
-  ctx.fillStyle=hi?'#fff':color;
-  ctx.beginPath();ctx.arc(x,y,14*Math.max(sx,sy),0,Math.PI*2);ctx.fill();
-  ctx.strokeStyle=hi?color:'#fff';ctx.lineWidth=2;ctx.stroke();
-  ctx.fillStyle=hi?color:'#fff';
-  ctx.font=`bold ${Math.round(10*sx)}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText(el.label,x,y+0.5);
-  ctx.restore();
+function pdDrawPl(c,p,alpha,ghost){
+  c.save();c.globalAlpha=alpha;
+  const color=p.team==='team'?'#3b82f6':'#ef4444';
+  if(ghost){c.strokeStyle=color;c.lineWidth=1.5;c.setLineDash([3,3]);c.beginPath();c.arc(p.x,p.y,12,0,Math.PI*2);c.stroke();c.setLineDash([]);}
+  else{c.fillStyle=color;c.beginPath();c.arc(p.x,p.y,14,0,Math.PI*2);c.fill();c.strokeStyle='rgba(255,255,255,.8)';c.lineWidth=2;c.stroke();c.fillStyle='#fff';c.font='bold 10px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(p.label,p.x,p.y+.5);}
+  c.restore();
 }
 
-function pdDrawPathEl(ctx,el,sx,sy){
-  if(el.points.length<2) return;
-  ctx.save();
-  ctx.strokeStyle=el.style==='pass'?'#f59e0b':'#fff';
-  ctx.lineWidth=2;
-  ctx.setLineDash(el.style==='run'?[6,4]:[]);
-  ctx.globalAlpha=0.9;
-  ctx.beginPath();ctx.moveTo(el.points[0].x*sx,el.points[0].y*sy);
-  el.points.forEach(p=>ctx.lineTo(p.x*sx,p.y*sy));ctx.stroke();
-  if(el.style==='pass'&&el.points.length>1){
-    const l=el.points[el.points.length-1],pr=el.points[el.points.length-2];
-    const ang=Math.atan2((l.y-pr.y)*sy,(l.x-pr.x)*sx);
-    ctx.globalAlpha=1;ctx.setLineDash([]);ctx.fillStyle='#f59e0b';
-    ctx.beginPath();ctx.save();ctx.translate(l.x*sx,l.y*sy);ctx.rotate(ang);
-    ctx.moveTo(0,0);ctx.lineTo(-12,-6);ctx.lineTo(-12,6);ctx.closePath();ctx.fill();ctx.restore();
+function pdDrawBl(c,b,alpha){
+  c.save();c.globalAlpha=alpha;c.fillStyle='#f59e0b';c.beginPath();c.arc(b.x,b.y,7,0,Math.PI*2);c.fill();c.strokeStyle='rgba(255,255,255,.8)';c.lineWidth=1.5;c.stroke();c.restore();
+}
+
+function pdDrawTrails(c){
+  if(pdKeyframes.length<2) return;
+  pdPlayers.forEach(p=>{
+    const trail=pdKeyframes.map(kf=>kf.players.find(pl=>pl.id===p.id)).filter(Boolean);
+    if(trail.length<2) return;
+    c.save();c.strokeStyle=p.team==='team'?'rgba(59,130,246,.25)':'rgba(239,68,68,.25)';c.lineWidth=1.5;c.setLineDash([4,4]);
+    c.beginPath();c.moveTo(trail[0].x,trail[0].y);trail.forEach(pt=>c.lineTo(pt.x,pt.y));c.stroke();c.restore();
+  });
+  const bt=pdKeyframes.map(kf=>kf.ball);
+  if(bt.length>1){c.save();c.strokeStyle='rgba(245,158,11,.35)';c.lineWidth=2;c.setLineDash([4,4]);c.beginPath();c.moveTo(bt[0].x,bt[0].y);bt.forEach(b=>c.lineTo(b.x,b.y));c.stroke();c.restore();}
+}
+
+function pdStepLbl(c,txt){
+  c.save();c.font='500 13px sans-serif';const w=c.measureText(txt).width+20;
+  c.fillStyle='rgba(0,0,0,.5)';c.beginPath();c.roundRect(340-w/2,8,w,22,4);c.fill();
+  c.fillStyle='#fff';c.textAlign='center';c.textBaseline='middle';c.fillText(txt,340,19);c.restore();
+}
+
+function pdRender(){
+  const c=document.getElementById('pd-court');if(!c) return;
+  const ctx=c.getContext('2d');ctx.clearRect(0,0,680,300);
+  pdDrawCourt(ctx,680,300);pdDrawTrails(ctx);
+  if(pdKeyframes.length>0){const prev=pdKeyframes[pdKeyframes.length-1];prev.players.forEach(p=>pdDrawPl(ctx,p,.22,true));}
+  pdPlayers.forEach(p=>pdDrawPl(ctx,p,1,false));
+  pdDrawBl(ctx,pdBall,1);
+}
+
+function pdRenderAnimFrame(c,kfs,t){
+  c.clearRect(0,0,680,300);pdDrawCourt(c,680,300);
+  const total=kfs.length-1,seg=t*total;
+  const i=Math.min(Math.floor(seg),total-1),frac=seg-i;
+  kfs[i].players.forEach((pA,idx)=>{
+    const pB=kfs[Math.min(i+1,total)].players[idx];if(!pB) return;
+    pdDrawPl(c,{...pA,x:pA.x+(pB.x-pA.x)*frac,y:pA.y+(pB.y-pA.y)*frac},1,false);
+  });
+  const bA=kfs[i].ball,bB=kfs[Math.min(i+1,total)].ball;
+  pdDrawBl(c,{x:bA.x+(bB.x-bA.x)*frac,y:bA.y+(bB.y-bA.y)*frac},1);
+  pdStepLbl(c,'Step '+(i+1)+' → '+Math.min(i+2,kfs.length));
+}
+
+// ── Keyframe recording ─────────────────────────────────────────────────
+function pdSnapshot(){
+  const snap={players:pdPlayers.map(p=>({...p})),ball:{...pdBall}};
+  pdKeyframes.push(snap);
+  pdUpdateTimeline();pdUpdateBtns();pdRender();
+}
+
+function pdUndo(){if(pdKeyframes.length>0){pdKeyframes.pop();pdUpdateTimeline();pdUpdateBtns();pdRender();}}
+
+function pdClearAll(){
+  pdKeyframes=[];pdBuildPlayers();pdStopAnim();
+  pdUpdateTimeline();pdUpdateBtns();pdRender();
+}
+
+function pdUpdateTimeline(){
+  document.getElementById('pd-timeline').innerHTML=pdKeyframes.map((kf,i)=>`
+    <div class="kf-chip" onclick="pdJumpKF(${i})">
+      <div class="kf-num">Step ${i+1}</div>
+      <div class="kf-dots">${kf.players.map(p=>`<div class="kf-dot" style="background:${p.team==='team'?'#3b82f6':'#ef4444'}"></div>`).join('')}<div class="kf-dot" style="background:#f59e0b"></div></div>
+    </div>`).join('');
+  document.getElementById('pd-steps-b').textContent=pdKeyframes.length+' step'+(pdKeyframes.length!==1?'s':'');
+}
+
+function pdJumpKF(i){
+  if(pdAnimating) return;
+  const kf=pdKeyframes[i];pdPlayers=kf.players.map(p=>({...p}));pdBall={...kf.ball};
+  document.querySelectorAll('.kf-chip').forEach((c,ci)=>c.classList.toggle('active',ci===i));
+  pdRender();
+}
+
+function pdUpdateBtns(){
+  const has=pdKeyframes.length>0,has2=pdKeyframes.length>1;
+  document.getElementById('pd-undo-btn').disabled=!has;
+  document.getElementById('pd-anim-btn').disabled=!has2;
+  document.getElementById('pd-reset-btn').disabled=!has2;
+  document.getElementById('pd-save-btn').disabled=!has2;
+}
+
+// ── Animation ──────────────────────────────────────────────────────────
+function pdToggleAnim(){pdAnimating?pdStopAnim():pdStartAnim();}
+
+function pdStartAnim(){
+  if(pdKeyframes.length<2) return;
+  pdAnimating=true;pdAnimT=0;pdAnimLastTs=null;
+  document.getElementById('pd-anim-btn').textContent='⏸ Pause';
+  document.getElementById('pd-mode-b').textContent='▶ Playing';
+  const c=document.getElementById('pd-court').getContext('2d');
+  function frame(ts){
+    if(!pdAnimLastTs) pdAnimLastTs=ts;
+    const dt=(ts-pdAnimLastTs)/1000;pdAnimLastTs=ts;
+    pdAnimT=Math.min(pdAnimT+dt*.28,1);
+    pdRenderAnimFrame(c,pdKeyframes,pdAnimT);
+    document.getElementById('pd-prog').style.width=(pdAnimT*100).toFixed(1)+'%';
+    const total=pdKeyframes.length-1,i=Math.min(Math.floor(pdAnimT*total),total-1);
+    document.querySelectorAll('.kf-chip').forEach((ch,ci)=>ch.classList.toggle('playing-kf',ci===i||ci===i+1));
+    if(pdAnimT<1) pdAnimRaf=requestAnimationFrame(frame);
+    else{pdAnimating=false;document.getElementById('pd-anim-btn').textContent='↺ Replay';document.getElementById('pd-mode-b').textContent='✅ Done';}
   }
-  ctx.restore();
+  pdAnimRaf=requestAnimationFrame(frame);
 }
 
-function pdRedraw(){
-  const c=document.getElementById('pd-canvas');if(!c) return;
-  const ctx=c.getContext('2d');
-  pdDrawBball(ctx,c.width,c.height);
-  pdElements.forEach(e=>{if(e.type==='path') pdDrawPathEl(ctx,e,1,1);});
-  pdElements.forEach(e=>{if(e.type==='player') pdDrawPlayer(ctx,e,1,1,false);});
+function pdStopAnim(){
+  pdAnimating=false;cancelAnimationFrame(pdAnimRaf);pdAnimLastTs=null;
+  document.getElementById('pd-anim-btn').textContent='▶ Play';
+  document.getElementById('pd-mode-b').textContent='🔴 Recording';
+  pdRender();
 }
 
-function pdDrawPath(){
-  if(pdPath.length<2) return;
-  const c=document.getElementById('pd-canvas');const ctx=c.getContext('2d');
-  ctx.save();ctx.strokeStyle=pdTool_val==='pass'?'#f59e0b':'#fff';ctx.lineWidth=2;
-  if(pdTool_val==='run') ctx.setLineDash([6,4]);ctx.globalAlpha=0.5;
-  ctx.beginPath();ctx.moveTo(pdPath[0].x,pdPath[0].y);pdPath.forEach(p=>ctx.lineTo(p.x,p.y));ctx.stroke();ctx.restore();
+function pdResetAnim(){
+  pdStopAnim();pdAnimT=0;
+  document.getElementById('pd-prog').style.width='0%';
+  if(pdKeyframes.length>0) pdJumpKF(0); else pdRender();
 }
 
-function pdClear(){pdElements=[];pdPath=[];pdRedraw();}
-
-function pdSave(){
+// ── Save play ──────────────────────────────────────────────────────────
+async function pdSavePlay(){
   const name=document.getElementById('pd-play-name').value.trim();
   const msg=document.getElementById('pd-save-msg');
   if(!name){msg.textContent='Give the play a name first!';msg.style.color='var(--red)';return;}
-  if(!pdElements.some(e=>e.type==='player')){msg.textContent='Add at least one player!';msg.style.color='var(--red)';return;}
-  pdSavedPlays.unshift({id:Date.now(),name,elements:JSON.parse(JSON.stringify(pdElements)),ratings:[],date:new Date().toLocaleDateString()});
-  pdPersist();
-  msg.textContent='✓ Play saved! Switch to Playbook to see it.';msg.style.color='var(--green)';
+  if(pdKeyframes.length<2){msg.textContent='Record at least 2 steps!';msg.style.color='var(--red)';return;}
+  msg.textContent='Saving...';msg.style.color='var(--text-2)';
+  const play={name,keyframes:JSON.parse(JSON.stringify(pdKeyframes)),teamCount:pdTeamCount,oppCount:pdOppCount,ratings:[]};
+  await pdPersistNew(play);
+  pdSavedPlays.unshift(play);
+  msg.textContent='✓ Saved to playbook!';msg.style.color='var(--green)';
   document.getElementById('pd-play-name').value='';
   setTimeout(()=>msg.textContent='',3000);
 }
 
+// ── Viewer / list ──────────────────────────────────────────────────────
 function pdRenderList(){
   const list=document.getElementById('pd-plays-list');
   document.getElementById('pd-plays-ct').textContent=pdSavedPlays.length+' play'+(pdSavedPlays.length!==1?'s':'');
   if(!pdSavedPlays.length){list.innerHTML='<div class="pd-empty">No plays yet.<br>Ask your coach to add some in Coach mode!</div>';return;}
-  list.innerHTML=pdSavedPlays.map((play,pi)=>`
+  list.innerHTML=pdSavedPlays.map(play=>`
     <div class="pd-play-card" id="pdpc${play.id}">
       <div class="pd-play-hdr" onclick="pdToggle(${play.id})">
-        <div><div class="pd-play-title">${play.name}</div><div class="pd-play-meta">Added ${play.date} · ${play.elements.filter(e=>e.type==='player'&&e.team==='team').length} players</div></div>
+        <div>
+          <div class="pd-play-title">${play.name}</div>
+          <div class="pd-play-meta">${play.keyframes.length} steps · ${play.team_count||play.teamCount}v${play.opp_count||play.oppCount}</div>
+        </div>
         <span class="pd-play-chev">›</span>
       </div>
       <div class="pd-play-body">
         <div class="pd-viewer-wrap"><canvas id="pdvc${play.id}" height="300" style="display:block;width:100%;"></canvas></div>
         <div class="pos-label">Tap a position to see it from their view:</div>
-        <div class="pos-btns" id="pdpos${play.id}">${play.elements.filter(e=>e.type==='player').map(p=>`<button class="pos-btn" onclick="pdSelectPos(${play.id},'${p.label}')">${p.label}</button>`).join('')}</div>
-        <div class="persp-box" id="pdpersp${play.id}"><div class="persp-title" id="pdpt${play.id}"></div><div class="persp-desc" id="pdpd${play.id}"></div></div>
+        <div class="pos-btns" id="pdpos${play.id}">
+          ${play.keyframes[0].players.map(p=>`<button class="pos-btn" onclick="pdSelPos(${play.id},'${p.id}')">${p.label}</button>`).join('')}
+        </div>
+        <div class="persp-box" id="pdpersp${play.id}">
+          <div class="persp-title" id="pdpt${play.id}"></div>
+          <div class="persp-desc" id="pdpd${play.id}"></div>
+        </div>
         <div class="pd-actions">
-          <button class="pd-anim-btn" onclick="pdAnimate(${play.id})">▶ Animate</button>
-          <div class="star-row" id="pdstars${play.id}">${[1,2,3,4,5].map(s=>`<span class="pstar${pdAvg(play)>=s?' on':''}" onclick="pdRate(${play.id},${s})">★</span>`).join('')}<span class="rating-ct">${play.ratings.length} rating${play.ratings.length!==1?'s':''}</span></div>
-          <button class="pd-del-btn" onclick="pdDelete(${play.id})">Delete</button>
+          <button class="pd-anim-btn" onclick="pdPlaySaved(${play.id})">▶ Animate</button>
+          <div class="star-row" id="pdstars${play.id}">
+            ${[1,2,3,4,5].map(s=>`<span class="pstar${pdAvg(play)>=s?' on':''}" onclick="pdRate(${play.id},${s})">★</span>`).join('')}
+            <span class="rating-ct">${(play.ratings||[]).length} rating${(play.ratings||[]).length!==1?'s':''}</span>
+          </div>
+          <button class="pd-del-btn" onclick="pdDeletePlay(${play.id})">Delete</button>
         </div>
       </div>
     </div>`).join('');
 }
 
-function pdAvg(play){return play.ratings.length?play.ratings.reduce((a,b)=>a+b,0)/play.ratings.length:0;}
+function pdAvg(play){const r=play.ratings||[];return r.length?r.reduce((a,b)=>a+b,0)/r.length:0;}
 
 function pdToggle(id){
   const card=document.getElementById('pdpc'+id);
   const wasOpen=card.classList.contains('open');
   document.querySelectorAll('.pd-play-card').forEach(c=>c.classList.remove('open'));
-  if(!wasOpen){card.classList.add('open');setTimeout(()=>pdRenderVC(id),50);}
+  if(!wasOpen){card.classList.add('open');setTimeout(()=>pdInitVC(id),40);}
 }
 
-function pdRenderVC(id,hiLabel){
+function pdInitVC(id){
   const play=pdSavedPlays.find(p=>p.id===id);if(!play) return;
   const vc=document.getElementById('pdvc'+id);if(!vc) return;
-  vc.width=680;vc.height=300;const ctx=vc.getContext('2d');
-  pdDrawBball(ctx,680,300);
-  play.elements.forEach(e=>{if(e.type==='path') pdDrawPathEl(ctx,e,1,1);});
-  play.elements.forEach(e=>{if(e.type==='player') pdDrawPlayer(ctx,e,1,1,e.label===hiLabel);});
+  vc.width=680;vc.height=300;const c=vc.getContext('2d');
+  pdDrawCourt(c,680,300);
+  play.keyframes[0].players.forEach(p=>pdDrawPl(c,p,1,false));
+  pdDrawBl(c,play.keyframes[0].ball,1);
 }
 
-function pdSelectPos(id,label){
-  document.querySelectorAll(`#pdpos${id} .pos-btn`).forEach(b=>b.classList.toggle('on',b.textContent===label));
-  const info=PD_POSITIONS[label]||{title:label,desc:'Watch the play carefully and be ready for your moment!'};
+function pdPlaySaved(id){
+  const play=pdSavedPlays.find(p=>p.id===id);if(!play||play.keyframes.length<2) return;
+  const vc=document.getElementById('pdvc'+id);if(!vc) return;
+  vc.width=680;vc.height=300;const c=vc.getContext('2d');
+  if(pdSavedAnimRafs[id]) cancelAnimationFrame(pdSavedAnimRafs[id]);
+  let t=0,last=null;
+  function frame(ts){
+    if(!last) last=ts;t=Math.min(t+(ts-last)/1000*.28,1);last=ts;
+    pdRenderAnimFrame(c,play.keyframes,t);
+    if(t<1) pdSavedAnimRafs[id]=requestAnimationFrame(frame);
+  }
+  pdSavedAnimRafs[id]=requestAnimationFrame(frame);
+}
+
+function pdSelPos(id,pid){
+  const play=pdSavedPlays.find(p=>p.id===id);if(!play) return;
+  const pl=play.keyframes[0].players.find(p=>p.id===pid);
+  document.querySelectorAll(`#pdpos${id} .pos-btn`).forEach(b=>b.classList.toggle('on',b.textContent===pl?.label));
+  const info=PD_POSITIONS[pid]||{title:pid,desc:'Watch the play and be ready for your moment!'};
+  document.getElementById('pdpersp'+id).classList.add('active');
   document.getElementById('pdpt'+id).textContent='You are the '+info.title;
   document.getElementById('pdpd'+id).textContent=info.desc;
-  document.getElementById('pdpersp'+id).classList.add('active');
-  pdRenderVC(id,label);
+  pdInitVC(id);
 }
 
-function pdAnimate(id){
+async function pdRate(id,stars){
   const play=pdSavedPlays.find(p=>p.id===id);if(!play) return;
-  const vc=document.getElementById('pdvc'+id);if(!vc) return;
-  vc.width=680;vc.height=300;const ctx=vc.getContext('2d');
-  const paths=play.elements.filter(e=>e.type==='path');
-  const players=play.elements.filter(e=>e.type==='player');
-  let t=0;const dur=120;
-  if(pdAnimStates[id]) cancelAnimationFrame(pdAnimStates[id]);
-  function frame(){
-    t++;const prog=Math.min(t/dur,1);
-    pdDrawBball(ctx,680,300);
-    paths.forEach(el=>{const sub={...el,points:el.points.slice(0,Math.max(2,Math.floor(el.points.length*prog)))};pdDrawPathEl(ctx,sub,1,1);});
-    players.forEach(el=>pdDrawPlayer(ctx,el,1,1,false));
-    if(t<dur) pdAnimStates[id]=requestAnimationFrame(frame);
-  }
-  frame();
-}
-
-function pdRate(id,stars){
-  const play=pdSavedPlays.find(p=>p.id===id);if(!play) return;
-  play.ratings.push(stars);pdPersist();
+  play.ratings=play.ratings||[];play.ratings.push(stars);
+  await pdPersistRating(id,play.ratings);
   const avg=pdAvg(play);
   document.getElementById('pdstars'+id).innerHTML=[1,2,3,4,5].map(s=>`<span class="pstar${avg>=s?' on':''}" onclick="pdRate(${id},${s})">★</span>`).join('')+`<span class="rating-ct">${play.ratings.length} rating${play.ratings.length!==1?'s':''}</span>`;
 }
 
-function pdDelete(id){
-  pdSavedPlays=pdSavedPlays.filter(p=>p.id!==id);pdPersist();pdRenderList();
+async function pdDeletePlay(id){
+  await pdDeleteFromDB(id);
+  pdSavedPlays=pdSavedPlays.filter(p=>p.id!==id);
+  pdRenderList();
 }
 
 pdLoadPlays();
