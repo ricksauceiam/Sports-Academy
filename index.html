@@ -1509,7 +1509,7 @@ async function coachSavePlay(){
   setTimeout(()=>msg.textContent='',3000);
 }
 
-// ── COACH PLAY ACTIONS ────────────────────────────────────────────────
+// ── COACH PLAY ACTIONS (keyframe-recording) ───────────────────────────
 let coachActionRaf=null;
 
 function coachTriggerAction(type){
@@ -1519,6 +1519,16 @@ function coachTriggerAction(type){
   else if(type==='miss') coachAnimateMiss(msg);
   else if(type==='steal') coachAnimateSteal(msg);
   else if(type==='foul') coachAnimateFoul(msg);
+}
+
+function coachSnap(extra={}){
+  // snapshot current state with optional action metadata baked in
+  coachKFs.push({
+    players:coachPlayers.map(p=>({...p})),
+    ball:{...coachBall},
+    ...extra
+  });
+  coachUpdateTimeline();coachUpdateBtns();
 }
 
 function coachGetShooter(){
@@ -1559,9 +1569,20 @@ function coachAnimateMake(msg){
   const basket={x:595,y:150};
   const from={x:coachBall.x,y:coachBall.y};
   let t=0,phase='arc';msg.textContent='';
+  // Snap the "before" state
+  coachSnap({action:'make_start',shotFrom:{x:from.x,y:from.y},basket:{x:basket.x,y:basket.y}});
   coachActionRaf=requestAnimationFrame(function frame(){
     t+=0.035;
-    if(phase==='arc'&&t>=1){phase='celebrate';t=0;}
+    if(phase==='arc'&&t>=1){
+      phase='celebrate';t=0;
+      coachBall.x=basket.x;coachBall.y=basket.y;
+      // Snap the "made it" state — players flagged as celebrating
+      coachSnap({
+        action:'make_scored',
+        basket:{x:basket.x,y:basket.y},
+        celebratePlayers:coachPlayers.filter(p=>p.team==='team').map(p=>p.id)
+      });
+    }
     if(phase==='arc'){
       coachRenderWithOverlay(ctx=>{
         coachDrawShotArc(ctx,from,basket,t,'#f59e0b');
@@ -1578,13 +1599,12 @@ function coachAnimateMake(msg){
             ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(p.label,p.x,p.y+.5);ctx.restore();
           }
         });
-        coachBall.x=basket.x;coachBall.y=basket.y;
         ctx.save();ctx.globalAlpha=0.6*Math.max(0,1-t/0.8);ctx.strokeStyle='#fff';ctx.lineWidth=1.5;
         for(let i=0;i<4;i++){ctx.beginPath();ctx.arc(basket.x,basket.y+i*6,10-i*1.5,0,Math.PI*2);ctx.stroke();}ctx.restore();
         if(t<0.5){ctx.save();ctx.globalAlpha=1-t*2;ctx.font='bold 22px sans-serif';ctx.fillStyle='#27a848';ctx.textAlign='center';ctx.fillText('+2 🏀',basket.x,basket.y-30-t*40);ctx.restore();}
       });
-      if(t>0.15&&!msg.textContent){msg.style.color='var(--green)';msg.textContent='Bucket! All offensive players turn green! 🎉';}
-      if(t>=1){coachCelebrationConfetti();return;}
+      if(t>0.15&&!msg.textContent){msg.style.color='var(--green)';msg.textContent='Bucket! Recorded into the play 🎉';}
+      if(t>=1){coachCelebrationConfetti();coachRender();return;}
     }
     coachActionRaf=requestAnimationFrame(frame);
   });
@@ -1597,10 +1617,20 @@ function coachAnimateMiss(msg){
   const rebounder=coachGetRebounder();
   const reboundLand={x:basket.x-30+Math.random()*60,y:basket.y-20+Math.random()*40};
   let t=0,phase='arc';msg.textContent='';
+  // Snap before state
+  coachSnap({action:'miss_start',shotFrom:{x:from.x,y:from.y},rimHit,rebounderID:rebounder.id,reboundLand});
   coachActionRaf=requestAnimationFrame(function frame(){
     t+=0.032;
-    if(phase==='arc'&&t>=1){phase='rebound';t=0;coachBall.x=rimHit.x;coachBall.y=rimHit.y;}
-    else if(phase==='rebound'&&t>=1){coachBall.x=reboundLand.x;coachBall.y=reboundLand.y;coachRender();return;}
+    if(phase==='arc'&&t>=1){
+      phase='rebound';t=0;
+      coachBall.x=rimHit.x;coachBall.y=rimHit.y;
+    } else if(phase==='rebound'&&t>=1){
+      coachBall.x=reboundLand.x;coachBall.y=reboundLand.y;
+      // Snap rebound secured state
+      coachSnap({action:'miss_rebounded',rebounderID:rebounder.id,reboundLand});
+      if(!msg.textContent){msg.style.color='var(--brand)';msg.textContent=rebounder.label+' rebound recorded into the play! 💪';}
+      coachRender();return;
+    }
     if(phase==='arc'){
       coachRenderWithOverlay(ctx=>{
         coachDrawShotArc(ctx,from,rimHit,t,'#f59e0b');
@@ -1618,7 +1648,6 @@ function coachAnimateMiss(msg){
         ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(rebounder.label,rebounder.x,rebounder.y+.5);ctx.restore();
         if(t>0.3){ctx.save();ctx.globalAlpha=Math.min((t-0.3)*3,1);ctx.font='bold 16px sans-serif';ctx.fillStyle='#185FA5';ctx.textAlign='center';ctx.fillText('REBOUND!',rebounder.x,rebounder.y-26);ctx.restore();}
       });
-      if(t>0.3&&!msg.textContent){msg.style.color='var(--brand)';msg.textContent='Miss off the rim! '+rebounder.label+' gets the rebound! 💪';}
     }
     coachActionRaf=requestAnimationFrame(frame);
   });
@@ -1630,6 +1659,8 @@ function coachAnimateSteal(msg){
   const origBall={x:coachBall.x,y:coachBall.y};
   const stealer=oppPlayers.reduce((b,p)=>Math.hypot(p.x-coachBall.x,p.y-coachBall.y)<Math.hypot(b.x-coachBall.x,b.y-coachBall.y)?p:b,oppPlayers[0]);
   let t=0;msg.textContent='';
+  // Snap before
+  coachSnap({action:'steal_start',stealerID:stealer.id,stealFrom:{x:origBall.x,y:origBall.y}});
   coachActionRaf=requestAnimationFrame(function frame(){
     t+=0.04;
     const dashT=Math.min(t/0.6,1);
@@ -1644,15 +1675,21 @@ function coachAnimateSteal(msg){
       if(dashT<1){ctx.save();ctx.globalAlpha=0.6*(1-dashT);ctx.strokeStyle='#f59e0b';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(origBall.x,origBall.y);ctx.lineTo(stealer.x,stealer.y);ctx.stroke();ctx.restore();}
       if(t>0.5){ctx.save();ctx.globalAlpha=Math.min((t-0.5)*4,1)*(1-Math.max(0,t-1.2)*2);ctx.font='bold 18px sans-serif';ctx.fillStyle='#ef4444';ctx.textAlign='center';ctx.fillText('STEAL! ⚡',stealer.x,stealer.y-30);ctx.restore();}
     });
-    if(t>0.5&&!msg.textContent){msg.style.color='var(--red)';msg.textContent='Steal by '+stealer.label+'! Ball stripped away! ⚡';}
-    if(t<1.4) coachActionRaf=requestAnimationFrame(frame);
-    else coachRender();
+    if(t<1.4){coachActionRaf=requestAnimationFrame(frame);}
+    else{
+      // Snap after — ball at stealer
+      coachSnap({action:'steal_secured',stealerID:stealer.id});
+      if(!msg.textContent){msg.style.color='var(--red)';msg.textContent='Steal by '+stealer.label+' recorded into the play! ⚡';}
+      coachRender();
+    }
   });
 }
 
 function coachAnimateFoul(msg){
   const foulPlayer=coachPlayers.find(p=>p.team==='opp')||coachPlayers[0];
   let t=0;msg.textContent='';
+  // Snap before
+  coachSnap({action:'foul_start',foulPlayerID:foulPlayer.id});
   coachActionRaf=requestAnimationFrame(function frame(){
     t+=0.04;
     coachRenderWithOverlay(ctx=>{
@@ -1671,9 +1708,12 @@ function coachAnimateFoul(msg){
       ctx.font='bold 22px sans-serif';ctx.fillStyle='#ef4444';ctx.textAlign='center';ctx.fillText('🚨 FOUL!',340,80);
       ctx.font='bold 14px sans-serif';ctx.fillStyle='#fff';ctx.fillText(foulPlayer.label+' commits the foul',340,108);ctx.restore();}
     });
-    if(t>0.4&&!msg.textContent){msg.style.color='var(--red)';msg.textContent='Foul on '+foulPlayer.label+'! Whistle blown! 🚨';}
-    if(t<1.6) coachActionRaf=requestAnimationFrame(frame);
-    else coachRender();
+    if(t<1.6){coachActionRaf=requestAnimationFrame(frame);}
+    else{
+      coachSnap({action:'foul_called',foulPlayerID:foulPlayer.id});
+      if(!msg.textContent){msg.style.color='var(--red)';msg.textContent='Foul on '+foulPlayer.label+' recorded! 🚨';}
+      coachRender();
+    }
   });
 }
 
@@ -1936,13 +1976,113 @@ function pdRenderAnimFrame(c,kfs,t){
   c.clearRect(0,0,680,300);pdDrawCourt(c,680,300);
   const total=kfs.length-1,seg=t*total;
   const i=Math.min(Math.floor(seg),total-1),frac=seg-i;
-  kfs[i].players.forEach((pA,idx)=>{
-    const pB=kfs[Math.min(i+1,total)].players[idx];if(!pB) return;
-    pdDrawPl(c,{...pA,x:pA.x+(pB.x-pA.x)*frac,y:pA.y+(pB.y-pA.y)*frac},1,false);
+  const kfA=kfs[i],kfB=kfs[Math.min(i+1,total)];
+
+  // Draw players with action-aware overrides
+  kfA.players.forEach((pA,idx)=>{
+    const pB=kfB.players[idx];if(!pB) return;
+    const interp={...pA,x:pA.x+(pB.x-pA.x)*frac,y:pA.y+(pB.y-pA.y)*frac};
+    if(kfB.action==='make_scored'&&pA.team==='team'){
+      const scale=1+Math.sin(frac*Math.PI*6)*0.15*(1-frac*0.7);
+      c.save();c.translate(interp.x,interp.y);c.scale(scale,scale);c.translate(-interp.x,-interp.y);
+      c.fillStyle='#27a848';c.beginPath();c.arc(interp.x,interp.y,14,0,Math.PI*2);c.fill();
+      c.strokeStyle='#fff';c.lineWidth=2;c.stroke();
+      c.fillStyle='#fff';c.font='bold 10px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(pA.label,interp.x,interp.y+.5);c.restore();
+    } else if((kfB.action==='steal_start'||kfB.action==='steal_secured')&&kfB.stealerID===pA.id){
+      const sc=1+Math.sin(frac*Math.PI*8)*0.1;
+      c.save();c.translate(interp.x,interp.y);c.scale(sc,sc);c.translate(-interp.x,-interp.y);
+      c.fillStyle='#ef4444';c.beginPath();c.arc(interp.x,interp.y,16,0,Math.PI*2);c.fill();
+      c.strokeStyle='#fff';c.lineWidth=2.5;c.stroke();
+      c.fillStyle='#fff';c.font='bold 10px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(pA.label,interp.x,interp.y+.5);c.restore();
+    } else if(kfB.action==='miss_rebounded'&&kfB.rebounderID===pA.id&&frac>0.4){
+      const sc=1+Math.sin(frac*Math.PI*4)*0.12;
+      c.save();c.translate(interp.x,interp.y);c.scale(sc,sc);c.translate(-interp.x,-interp.y);
+      c.fillStyle='#185FA5';c.beginPath();c.arc(interp.x,interp.y,16,0,Math.PI*2);c.fill();
+      c.strokeStyle='#fff';c.lineWidth=2.5;c.stroke();
+      c.fillStyle='#fff';c.font='bold 10px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(pA.label,interp.x,interp.y+.5);c.restore();
+    } else if((kfB.action==='foul_start'||kfB.action==='foul_called')&&kfB.foulPlayerID===pA.id){
+      const shake=Math.sin(frac*60)*3*(1-Math.min(frac/0.8,1));
+      c.save();c.translate(interp.x+shake,interp.y);
+      c.fillStyle='#ef4444';c.beginPath();c.arc(0,0,16,0,Math.PI*2);c.fill();
+      c.strokeStyle='#fff';c.lineWidth=3;c.stroke();
+      c.fillStyle='#fff';c.font='bold 10px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(pA.label,0,.5);c.restore();
+    } else {
+      pdDrawPl(c,interp,1,false);
+    }
   });
-  const bA=kfs[i].ball,bB=kfs[Math.min(i+1,total)].ball;
-  pdDrawBl(c,{x:bA.x+(bB.x-bA.x)*frac,y:bA.y+(bB.y-bA.y)*frac},1);
-  pdStepLbl(c,'Step '+(i+1)+' → '+Math.min(i+2,kfs.length));
+
+  // Draw ball with action-aware arcs
+  const bA=kfA.ball,bB=kfB.ball;
+  if(kfB.action==='make_start'&&kfB.shotFrom&&kfB.basket){
+    const from=kfB.shotFrom,to=kfB.basket;
+    const mid={x:(from.x+to.x)/2,y:Math.min(from.y,to.y)-80};
+    c.save();c.strokeStyle='#f59e0b';c.lineWidth=2;c.setLineDash([4,3]);c.globalAlpha=0.4;
+    c.beginPath();c.moveTo(from.x,from.y);
+    for(let j=0;j<=20;j++){const s=j/20*frac;c.lineTo(from.x+(mid.x-from.x)*s+(to.x-mid.x)*s,from.y+(mid.y-from.y)*s+(to.y-mid.y)*s);}
+    c.stroke();c.setLineDash([]);
+    const bx=from.x+(mid.x-from.x)*frac+(to.x-mid.x)*frac;
+    const by=from.y+(mid.y-from.y)*frac+(to.y-mid.y)*frac;
+    c.globalAlpha=1;c.fillStyle='#f59e0b';c.beginPath();c.arc(bx,by,8,0,Math.PI*2);c.fill();
+    c.strokeStyle='#fff';c.lineWidth=2;c.stroke();c.restore();
+  } else if(kfB.action==='miss_start'&&kfB.shotFrom&&kfB.rimHit){
+    const from=kfB.shotFrom,to=kfB.rimHit;
+    const mid={x:(from.x+to.x)/2,y:Math.min(from.y,to.y)-80};
+    c.save();c.strokeStyle='#f59e0b';c.lineWidth=2;c.setLineDash([4,3]);c.globalAlpha=0.4;
+    c.beginPath();c.moveTo(from.x,from.y);
+    for(let j=0;j<=20;j++){const s=j/20*frac;c.lineTo(from.x+(mid.x-from.x)*s+(to.x-mid.x)*s,from.y+(mid.y-from.y)*s+(to.y-mid.y)*s);}
+    c.stroke();c.setLineDash([]);
+    if(frac>0.85){c.strokeStyle='#ef4444';c.lineWidth=3;c.globalAlpha=(frac-0.85)*6;c.beginPath();c.arc(to.x-16,to.y-8,18,0,Math.PI*2);c.stroke();}
+    const bx=from.x+(mid.x-from.x)*frac+(to.x-mid.x)*frac;
+    const by=from.y+(mid.y-from.y)*frac+(to.y-mid.y)*frac;
+    c.globalAlpha=1;c.fillStyle='#f59e0b';c.beginPath();c.arc(bx,by,8,0,Math.PI*2);c.fill();
+    c.strokeStyle='#fff';c.lineWidth=2;c.stroke();c.restore();
+  } else if(kfB.action==='miss_rebounded'&&kfB.rimHit&&kfB.reboundLand){
+    const bx=kfB.rimHit.x+(kfB.reboundLand.x-kfB.rimHit.x)*frac;
+    const by=kfB.rimHit.y+(kfB.reboundLand.y-kfB.rimHit.y)*frac-Math.sin(frac*Math.PI)*30;
+    pdDrawBl(c,{x:bx,y:by},1);
+  } else if(kfB.action==='steal_start'&&kfB.stealFrom){
+    const st=kfB.players?kfB.players.find(p=>p.id===kfB.stealerID):null;
+    if(st){
+      const bx=kfB.stealFrom.x+(st.x-kfB.stealFrom.x)*Math.min(frac/0.6,1);
+      const by=kfB.stealFrom.y+(st.y-kfB.stealFrom.y)*Math.min(frac/0.6,1);
+      c.save();c.globalAlpha=0.5*(1-Math.min(frac/0.6,1));c.strokeStyle='#f59e0b';c.lineWidth=2;c.beginPath();c.moveTo(kfB.stealFrom.x,kfB.stealFrom.y);c.lineTo(st.x,st.y);c.stroke();c.restore();
+      pdDrawBl(c,{x:bx,y:by},1);
+    } else pdDrawBl(c,{x:bA.x+(bB.x-bA.x)*frac,y:bA.y+(bB.y-bA.y)*frac},1);
+  } else {
+    pdDrawBl(c,{x:bA.x+(bB.x-bA.x)*frac,y:bA.y+(bB.y-bA.y)*frac},1);
+  }
+
+  // Text overlays
+  if(kfB.action==='make_scored'&&frac<0.5){
+    const basket=kfB.basket||{x:595,y:150};
+    c.save();c.globalAlpha=(0.5-frac)*2;c.font='bold 22px sans-serif';c.fillStyle='#27a848';c.textAlign='center';c.fillText('+2 🏀',basket.x,basket.y-30-frac*40);c.restore();
+    c.save();c.globalAlpha=0.6*(1-frac*2);c.strokeStyle='#fff';c.lineWidth=1.5;
+    for(let j=0;j<4;j++){c.beginPath();c.arc(basket.x,basket.y+j*6,10-j*1.5,0,Math.PI*2);c.stroke();}c.restore();
+    const colors=['#27a848','#f59e0b','#fff'];
+    for(let j=0;j<8;j++){const angle=(j/8)*Math.PI*2,dist=frac*40;c.save();c.globalAlpha=Math.max(0,0.8-frac);c.fillStyle=colors[j%3];c.beginPath();c.arc(basket.x+Math.cos(angle)*dist,basket.y+Math.sin(angle)*dist,3,0,Math.PI*2);c.fill();c.restore();}
+  }
+  if(kfB.action==='miss_rebounded'&&frac>0.3){
+    const rb=kfB.players?kfB.players.find(p=>p.id===kfB.rebounderID):null;
+    if(rb){c.save();c.globalAlpha=Math.min((frac-0.3)*3,1);c.font='bold 16px sans-serif';c.fillStyle='#185FA5';c.textAlign='center';c.fillText('REBOUND!',rb.x,rb.y-26);c.restore();}
+  }
+  if((kfB.action==='steal_start'||kfB.action==='steal_secured')&&frac>0.5){
+    const st=kfB.players?kfB.players.find(p=>p.id===kfB.stealerID):null;
+    if(st){c.save();c.globalAlpha=Math.min((frac-0.5)*4,1);c.font='bold 18px sans-serif';c.fillStyle='#ef4444';c.textAlign='center';c.fillText('STEAL! ⚡',st.x,st.y-30);c.restore();}
+  }
+  if((kfB.action==='foul_start'||kfB.action==='foul_called')&&frac>0.2){
+    const flash=Math.max(0,Math.sin(frac*Math.PI*5)*0.25*(1-frac));
+    c.save();c.globalAlpha=flash;c.fillStyle='#ef4444';c.fillRect(0,0,680,300);c.restore();
+    c.save();c.globalAlpha=Math.min((frac-0.2)*3,1)*(1-Math.max(0,frac-0.8)*3);
+    c.font='bold 22px sans-serif';c.fillStyle='#ef4444';c.textAlign='center';c.fillText('🚨 FOUL!',340,80);
+    const fp=kfB.players?kfB.players.find(p=>p.id===kfB.foulPlayerID):null;
+    if(fp){c.font='bold 14px sans-serif';c.fillStyle='#fff';c.fillText(fp.label+' commits the foul',340,108);}
+    c.restore();
+  }
+
+  // Step label — use action label if available
+  const actionLabels={make_start:'Shot going up!',make_scored:'Bucket! 🎉',miss_start:'Shot — off the rim!',miss_rebounded:'Rebound!',steal_start:'Steal! ⚡',steal_secured:'Ball secured!',foul_start:'Foul! 🚨',foul_called:'Foul called!'};
+  const lbl=kfB.action?actionLabels[kfB.action]||('Step '+(i+1)):('Step '+(i+1)+' → '+Math.min(i+2,kfs.length));
+  pdStepLbl(c,lbl);
 }
 
 // ── Keyframe recording ─────────────────────────────────────────────────
