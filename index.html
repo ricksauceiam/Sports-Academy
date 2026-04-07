@@ -70,6 +70,17 @@ body {
 .ob-hero { text-align: center; padding: 12px 0 24px; }
 .ob-bounce { font-size: 64px; display: block; animation: bob 2s ease-in-out infinite; }
 @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+.trophy-wrap { position: relative; width: 160px; height: 160px; margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; }
+.trophy-center { font-size: 64px; animation: bob 2s ease-in-out infinite; display: block; position: relative; z-index: 2; }
+.orbit { position: absolute; width: 100%; height: 100%; top: 0; left: 0; animation: spin 4s linear infinite; }
+.orbit-ball { position: absolute; font-size: 26px; line-height: 1; }
+.o1 { animation: spin 4s linear infinite; }
+.o2 { animation: spin 4s linear infinite; animation-delay: -1.33s; }
+.o3 { animation: spin 4s linear infinite; animation-delay: -2.66s; }
+@keyframes spin {
+  0%   { transform: rotate(0deg) translateX(68px) rotate(0deg); }
+  100% { transform: rotate(-360deg) translateX(68px) rotate(360deg); }
+}
 .ob-title { font-family: var(--font); font-size: 28px; font-weight: 900; color: var(--text); letter-spacing: -0.5px; margin-bottom: 6px; }
 .ob-sub { font-size: 15px; color: var(--text-2); line-height: 1.55; }
 
@@ -345,7 +356,12 @@ body {
   <div class="steps"><div class="sdot active"></div><div class="sdot"></div><div class="sdot"></div></div>
   <div class="ob">
     <div class="ob-hero">
-      <span class="ob-bounce">🏆</span>
+      <div class="trophy-wrap">
+        <span class="trophy-center">🏆</span>
+        <span class="orbit-ball o1" style="position:absolute;animation:spin 4s linear infinite reverse;">⚽</span>
+        <span class="orbit-ball o2" style="position:absolute;animation:spin 4s linear infinite reverse;animation-delay:-1.33s;">🏀</span>
+        <span class="orbit-ball o3" style="position:absolute;animation:spin 4s linear infinite reverse;animation-delay:-2.66s;">⚾</span>
+      </div>
       <div class="ob-title">Sports Academy</div>
       <div class="ob-sub">Learn sports like a pro. Let's set up your player profile!</div>
     </div>
