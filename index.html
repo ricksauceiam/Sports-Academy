@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Sports Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand: #185FA5;
+  --brand-dark: #0C447C;
+  --brand-light: #E6F1FB;
+  --green: #3B6D11;
+  --green-light: #EAF3DE;
+  --amber: #854F0B;
+  --amber-light: #FAEEDA;
+  --red: #A32D2D;
+  --red-light: #FCEBEB;
+  --purple: #3C3489;
+  --purple-light: #EEEDFE;
+  --bg: #f7f8fc;
+  --card: #ffffff;
+  --text: #1a1a2e;
+  --text-2: #555577;
+  --text-3: #8888aa;
+  --border: rgba(0,0,0,0.08);
+  --border-2: rgba(0,0,0,0.14);
+  --radius: 16px;
+  --radius-lg: 22px;
+  --font: 'Nunito', sans-serif;
+  --font-body: 'Nunito Sans', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overscroll-behavior: none;
+}
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--card);
+  position: relative;
+}
+
+/* ─── SCREENS ─── */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ─── STEP DOTS ─── */
+.steps {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 20px 20px 0;
+}
+.sdot {
+  height: 8px; border-radius: 999px; background: var(--border-2);
+  transition: all .3s; width: 8px;
+}
+.sdot.done { background: var(--green); }
+.sdot.active { background: var(--brand); width: 24px; }
+
+/* ─── ONBOARDING ─── */
+.ob { padding: 24px 24px 32px; }
+.ob-hero { text-align: center; padding: 12px 0 24px; }
+.ob-bounce { font-size: 64px; display: block; animation: bob 2s ease-in-out infinite; }
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+.ob-title { font-family: var(--font); font-size: 28px; font-weight: 900; color: var(--text); letter-spacing: -0.5px; margin-bottom: 6px; }
+.ob-sub { font-size: 15px; color: var(--text-2); line-height: 1.55; }
+
+.name-preview-box {
+  background: var(--brand-light); border-radius: var(--radius-lg);
+  padding: 20px; text-align: center; margin-bottom: 20px;
+}
+.name-preview-icon { font-size: 48px; margin-bottom: 8px; display: block; }
+.name-preview-text { font-family: var(--font); font-size: 20px; font-weight: 800; color: var(--brand-dark); min-height: 28px; }
+
+.field-label { font-family: var(--font); font-size: 13px; font-weight: 700; color: var(--text-2); margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: .06em; }
+.name-input {
+  width: 100%; padding: 16px 18px; border-radius: var(--radius);
+  border: 2px solid var(--border-2); background: var(--bg);
+  color: var(--text); font-size: 18px; font-family: var(--font); font-weight: 700;
+  outline: none; transition: border-color .2s; text-align: center; margin-bottom: 20px;
+}
+.name-input:focus { border-color: var(--brand); background: #fff; }
+.name-input::placeholder { color: var(--text-3); font-weight: 400; }
+
+.cta-btn {
+  width: 100%; padding: 16px; border-radius: var(--radius);
+  border: none; background: var(--brand); color: #fff;
+  font-size: 18px; font-family: var(--font); font-weight: 800;
+  cursor: pointer; transition: background .15s, transform .1s;
+  letter-spacing: .01em;
+}
+.cta-btn:hover { background: var(--brand-dark); }
+.cta-btn:active { transform: scale(0.98); }
+.cta-btn:disabled { background: #c8c8d8; cursor: not-allowed; transform: none; }
+
+/* ─── AVATAR GRID ─── */
+.avatar-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 10px; margin-bottom: 20px;
+}
+.av-card {
+  border-radius: var(--radius); padding: 14px 8px 10px;
+  background: var(--bg); border: 2.5px solid transparent;
+  text-align: center; cursor: pointer; transition: all .15s;
+}
+.av-card:hover { border-color: var(--border-2); }
+.av-card.sel { border-color: var(--brand); background: var(--brand-light); }
+.av-emoji { font-size: 34px; display: block; margin-bottom: 6px; }
+.av-name { font-family: var(--font); font-size: 11px; font-weight: 700; color: var(--text-2); }
+.av-card.sel .av-name { color: var(--brand-dark); }
+
+/* ─── SPORT GRID ─── */
+.sport-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.sport-card {
+  border-radius: var(--radius-lg); padding: 20px 12px 16px;
+  text-align: center; cursor: pointer; border: 3px solid transparent;
+  transition: all .15s;
+}
+.sport-card:active { transform: scale(0.96); }
+.sport-card.sel { border-color: rgba(0,0,0,0.25); }
+.sport-icon { font-size: 44px; display: block; margin-bottom: 10px; }
+.sport-name { font-family: var(--font); font-size: 17px; font-weight: 800; margin-bottom: 3px; }
+.sport-tagline { font-size: 12px; opacity: .75; font-weight: 600; }
+.sc-soccer { background: #EAF3DE; color: #27500A; }
+.sc-basketball { background: #FAEEDA; color: #633806; }
+.sc-baseball { background: #E6F1FB; color: #0C447C; }
+.sc-football { background: #FBEAF0; color: #72243E; }
+.all-sports-btn {
+  width: 100%; padding: 14px; border-radius: var(--radius);
+  background: var(--bg); border: 2px solid var(--border-2);
+  color: var(--text); font-size: 15px; font-family: var(--font); font-weight: 700;
+  cursor: pointer; text-align: center; margin-bottom: 16px; transition: all .15s;
+}
+.all-sports-btn:hover, .all-sports-btn.sel { background: var(--purple-light); border-color: var(--purple); color: var(--purple); }
+
+/* ─── PLAYER CARD SCREEN ─── */
+.pc-wrap { padding: 24px; text-align: center; }
+.pc-greeting { font-family: var(--font); font-size: 26px; font-weight: 900; color: var(--text); margin-bottom: 4px; }
+.pc-sub { font-size: 15px; color: var(--text-2); margin-bottom: 24px; }
+.player-card {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg); padding: 28px 20px 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+}
+.pc-av { font-size: 72px; display: block; margin-bottom: 12px; }
+.pc-name { font-family: var(--font); font-size: 24px; font-weight: 900; color: var(--text); margin-bottom: 4px; }
+.pc-av-label { font-size: 13px; color: var(--text-3); font-weight: 600; margin-bottom: 16px; }
+.pc-sport-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  border-radius: 999px; padding: 8px 20px; font-size: 15px;
+  font-family: var(--font); font-weight: 700; margin-bottom: 20px;
+}
+.pc-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.pc-stat { background: var(--bg); border-radius: 12px; padding: 12px 8px; }
+.pc-stat-val { font-family: var(--font); font-size: 22px; font-weight: 900; color: var(--text); }
+.pc-stat-lbl { font-size: 11px; color: var(--text-3); margin-top: 2px; font-weight: 600; }
+
+/* ─── HUB ─── */
+.hub-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 16px 16px 0; background: var(--card);
+}
+.back-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1.5px solid var(--border-2); background: var(--bg);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: var(--text-2); flex-shrink: 0;
+  transition: all .15s; font-family: var(--font);
+}
+.back-btn:hover { background: var(--brand-light); color: var(--brand); }
+.hub-player { display: flex; align-items: center; gap: 8px; flex: 1; }
+.hub-av { font-size: 24px; }
+.hub-pname { font-family: var(--font); font-size: 15px; font-weight: 800; color: var(--text); }
+.xp-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.xp-pill { font-size: 12px; font-weight: 700; font-family: var(--font); padding: 4px 12px; border-radius: 999px; background: var(--amber-light); color: var(--amber); }
+.stars-row { display: flex; gap: 2px; }
+.son { color: #EF9F27; font-size: 14px; }
+.soff { color: #ddd; font-size: 14px; }
+.xp-bar-track { height: 6px; background: var(--bg); border-radius: 999px; margin: 10px 16px 0; overflow: hidden; }
+.xp-bar-fill { height: 100%; background: var(--green); border-radius: 999px; transition: width .5s; }
+.sport-strip {
+  display: flex; align-items: center; gap: 6px;
+  margin: 10px 16px 0; padding: 8px 14px;
+  border-radius: 12px; font-size: 13px; font-family: var(--font); font-weight: 700;
+}
+
+/* ─── NAV GRID ─── */
+.nav-grid {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 8px; padding: 12px 16px 12px;
+}
+.nav-tile {
+  border-radius: 14px; padding: 11px 4px 9px;
+  text-align: center; cursor: pointer; border: 2.5px solid transparent;
+  transition: all .15s;
+}
+.nav-tile.active { border-color: rgba(0,0,0,0.2); }
+.ntile-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+.ntile-lbl { font-size: 10px; font-family: var(--font); font-weight: 700; }
+.nt-quiz { background: #E6F1FB; color: #0C447C; }
+.nt-flash { background: #FAEEDA; color: #633806; }
+.nt-rules { background: #EAF3DE; color: #27500A; }
+.nt-plays { background: #FBEAF0; color: #72243E; }
+.nt-challenge { background: #EEEDFE; color: #3C3489; }
+
+/* ─── SECTIONS ─── */
+.section { display: none; padding: 0 16px 24px; }
+.section.visible { display: block; }
+
+/* QUIZ */
+.score-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
+.sp { border-radius: 999px; padding: 5px 14px; font-size: 13px; font-family: var(--font); font-weight: 700; }
+.sp-s { background: var(--brand-light); color: var(--brand-dark); }
+.sp-k { background: var(--amber-light); color: var(--amber); }
+.q-card { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+.q-sport-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-family: var(--font); font-weight: 700; padding: 3px 12px; border-radius: 999px; margin-bottom: 12px; }
+.q-text { font-family: var(--font); font-size: 18px; font-weight: 800; color: var(--text); line-height: 1.45; margin-bottom: 16px; }
+.q-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.opt {
+  padding: 14px 10px; border-radius: 14px; border: 2px solid var(--border-2);
+  background: var(--bg); color: var(--text);
+  font-size: 14px; font-family: var(--font); font-weight: 700;
+  cursor: pointer; text-align: center; transition: all .13s;
+}
+.opt:hover:not(:disabled) { background: var(--brand-light); border-color: var(--brand); color: var(--brand-dark); }
+.opt.correct { background: var(--green-light); border-color: var(--green); color: #173404; }
+.opt.wrong { background: var(--red-light); border-color: var(--red); color: #501313; }
+.fb-box { border-radius: 12px; padding: 10px 14px; font-size: 13px; font-family: var(--font); font-weight: 600; line-height: 1.5; display: none; margin-bottom: 10px; }
+.fb-y { background: var(--green-light); color: #27500A; }
+.fb-n { background: var(--red-light); color: #791F1F; }
+.next-btn { width: 100%; padding: 14px; border-radius: 14px; border: none; background: var(--brand); color: #fff; font-size: 16px; font-family: var(--font); font-weight: 800; cursor: pointer; display: none; transition: background .15s; }
+.next-btn:hover { background: var(--brand-dark); }
+
+/* FLASHCARDS */
+.fc-dots { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px; }
+.fc-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border-2); transition: background .2s; }
+.fc-dot.seen { background: var(--brand); }
+.fc-wrap { perspective: 1000px; height: 200px; cursor: pointer; margin-bottom: 14px; }
+.fc-inner { width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .45s; position: relative; }
+.fc-inner.flipped { transform: rotateY(180deg); }
+.fc-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
+.fc-front { background: var(--brand); }
+.fc-back { background: var(--card); border: 1.5px solid var(--border); transform: rotateY(180deg); }
+.fc-sport-lbl { font-size: 11px; font-family: var(--font); font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: #85B7EB; margin-bottom: 8px; }
+.fc-term { font-family: var(--font); font-size: 26px; font-weight: 900; color: #fff; }
+.fc-hint { font-size: 12px; color: #85B7EB; margin-top: 12px; font-weight: 600; }
+.fc-def { font-size: 15px; line-height: 1.65; color: var(--text); font-weight: 600; }
+.fc-ctrl { display: flex; align-items: center; justify-content: space-between; }
+.fc-btn { padding: 11px 22px; border-radius: 12px; border: 1.5px solid var(--border-2); background: var(--bg); color: var(--text); font-size: 14px; font-family: var(--font); font-weight: 700; cursor: pointer; transition: all .15s; }
+.fc-btn:hover { background: var(--brand-light); color: var(--brand-dark); border-color: var(--brand); }
+.fc-cnt { font-size: 13px; color: var(--text-3); font-weight: 600; }
+
+/* RULES */
+.stabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.stab { padding: 8px 14px; border-radius: 12px; font-size: 13px; font-family: var(--font); font-weight: 700; cursor: pointer; border: 1.5px solid var(--border-2); background: var(--bg); color: var(--text-2); transition: all .15s; }
+.stab.on { background: var(--green-light); border-color: var(--green); color: #27500A; }
+.rule-card { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; }
+.rule-hdr { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; cursor: pointer; }
+.rule-title { font-size: 15px; font-family: var(--font); font-weight: 700; color: var(--text); }
+.rule-chev { font-size: 20px; color: var(--text-3); transition: transform .2s; }
+.rule-card.open .rule-chev { transform: rotate(90deg); }
+.rule-body { font-size: 13px; color: var(--text-2); line-height: 1.7; padding: 0 16px 14px; display: none; font-weight: 500; }
+.rule-card.open .rule-body { display: block; }
+.fact-box { background: var(--amber-light); border-radius: 10px; padding: 10px 12px; margin-top: 10px; font-size: 12px; color: #633806; line-height: 1.6; font-weight: 600; }
+.fact-lbl { font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; color: var(--amber); }
+
+/* PLAYS */
+.play-sport-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.pstab { padding: 8px 16px; border-radius: 999px; font-size: 13px; font-family: var(--font); font-weight: 700; cursor: pointer; border: 1.5px solid var(--border-2); background: var(--bg); color: var(--text-2); transition: all .15s; }
+.pstab.on { background: var(--brand); color: #fff; border-color: var(--brand); }
+.play-nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.pnav { padding: 7px 14px; border-radius: 12px; font-size: 12px; font-family: var(--font); font-weight: 700; cursor: pointer; border: 1.5px solid var(--border-2); background: var(--bg); color: var(--text-2); transition: all .15s; }
+.pnav.on { background: var(--green-light); border-color: var(--green); color: #27500A; }
+.canvas-wrap { border-radius: var(--radius-lg); overflow: hidden; border: 1.5px solid var(--border); margin-bottom: 12px; background: #2d7a27; }
+.canvas-wrap.bball { background: #c8922a; }
+.canvas-wrap.bball-bg { background: #c8922a; }
+.canvas-wrap.bsball { background: #5a8f3c; }
+.field-canvas { display: block; width: 100%; }
+.play-info-card { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; }
+.play-info-title { font-family: var(--font); font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+.play-info-desc { font-size: 13px; color: var(--text-2); line-height: 1.65; font-weight: 500; }
+.play-steps { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.pstep { font-size: 11px; font-family: var(--font); font-weight: 700; padding: 4px 12px; border-radius: 999px; opacity: .4; transition: opacity .2s, font-weight .2s; }
+.ctrl-row { display: flex; gap: 10px; align-items: center; }
+.play-btn { padding: 11px 20px; border-radius: 12px; border: none; background: var(--brand); color: #fff; font-size: 14px; font-family: var(--font); font-weight: 800; cursor: pointer; transition: background .15s; }
+.play-btn:hover { background: var(--brand-dark); }
+.play-btn.pause { background: var(--green); }
+.play-btn.pause:hover { background: #27500A; }
+.reset-btn { padding: 11px 16px; border-radius: 12px; border: 1.5px solid var(--border-2); background: var(--bg); color: var(--text); font-size: 14px; font-family: var(--font); font-weight: 700; cursor: pointer; }
+.prog-track { flex: 1; height: 6px; background: var(--bg); border-radius: 999px; overflow: hidden; border: 1px solid var(--border); }
+.prog-fill { height: 100%; background: var(--brand); border-radius: 999px; transition: width .1s; }
+.play-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
+.leg { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-3); font-weight: 600; }
+.leg-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+
+/* CHALLENGES */
+.day-banner { background: var(--brand-light); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
+.day-ico { font-size: 26px; flex-shrink: 0; }
+.day-lbl { font-size: 11px; font-family: var(--font); font-weight: 800; color: var(--brand); text-transform: uppercase; letter-spacing: .06em; }
+.day-ttl { font-family: var(--font); font-size: 16px; font-weight: 800; color: var(--brand-dark); margin-top: 2px; }
+.ch-card { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; }
+.ch-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.ch-ttl { font-family: var(--font); font-size: 15px; font-weight: 800; color: var(--text); }
+.dbadge { font-size: 11px; padding: 3px 10px; border-radius: 999px; font-family: var(--font); font-weight: 700; }
+.d-e { background: var(--green-light); color: #27500A; }
+.d-m { background: var(--amber-light); color: #633806; }
+.d-h { background: var(--red-light); color: #791F1F; }
+.ch-desc { font-size: 13px; color: var(--text-2); line-height: 1.65; margin-bottom: 12px; font-weight: 500; }
+.ch-btn { padding: 9px 18px; border-radius: 10px; border: 1.5px solid var(--brand); background: transparent; color: var(--brand); font-size: 13px; font-family: var(--font); font-weight: 700; cursor: pointer; transition: all .15s; }
+.ch-btn:hover { background: var(--brand); color: #fff; }
+.ch-btn.done { background: var(--green-light); border-color: var(--green); color: #27500A; }
+
+/* ─── CONFETTI ─── */
+.confetti-piece {
+  position: fixed; top: -10px; width: 10px; height: 10px;
+  border-radius: 2px; animation: confettiFall linear forwards;
+  pointer-events: none; z-index: 9999;
+}
+@keyframes confettiFall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+@media (max-width: 480px) {
+  .ob-bounce { font-size: 52px; }
+  .ob-title { font-size: 24px; }
+  .nav-grid { gap: 6px; padding: 10px 12px 10px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ═══ S1: NAME ═══ -->
+<div id="s1" class="screen active">
+  <div class="steps"><div class="sdot active"></div><div class="sdot"></div><div class="sdot"></div></div>
+  <div class="ob">
+    <div class="ob-hero">
+      <span class="ob-bounce">🏆</span>
+      <div class="ob-title">Sports Academy</div>
+      <div class="ob-sub">Learn sports like a pro. Let's set up your player profile!</div>
+    </div>
+    <div class="name-preview-box">
+      <span class="name-preview-icon" id="np-icon">👤</span>
+      <div class="name-preview-text" id="np-text">Who are you?</div>
+    </div>
+    <label class="field-label" for="name-field">Your player name</label>
+    <input class="name-input" id="name-field" type="text" placeholder="e.g. Super Sam" maxlength="18" oninput="onName(this.value)" autocomplete="off" />
+    <button class="cta-btn" id="name-cta" onclick="goStep(2)" disabled>Next →</button>
+  </div>
+</div>
+
+<!-- ═══ S2: AVATAR ═══ -->
+<div id="s2" class="screen">
+  <div class="steps"><div class="sdot done"></div><div class="sdot active"></div><div class="sdot"></div></div>
+  <div class="ob">
+    <div class="ob-hero" style="padding-bottom:16px">
+      <div class="ob-title">Pick your avatar!</div>
+      <div class="ob-sub">Choose the one that feels like you.</div>
+    </div>
+    <div class="avatar-grid" id="av-grid"></div>
+    <button class="cta-btn" id="av-cta" onclick="goStep(3)" disabled>Next →</button>
+  </div>
+</div>
+
+<!-- ═══ S3: SPORT ═══ -->
+<div id="s3" class="screen">
+  <div class="steps"><div class="sdot done"></div><div class="sdot done"></div><div class="sdot active"></div></div>
+  <div class="ob">
+    <div class="ob-hero" style="padding-bottom:16px">
+      <div class="ob-title">Pick your sport!</div>
+      <div class="ob-sub">You can explore others any time.</div>
+    </div>
+    <div class="sport-grid">
+      <div class="sport-card sc-soccer" onclick="selSport('soccer',this)"><span class="sport-icon">⚽</span><div class="sport-name">Soccer</div><div class="sport-tagline">Goals & glory</div></div>
+      <div class="sport-card sc-basketball" onclick="selSport('basketball',this)"><span class="sport-icon">🏀</span><div class="sport-name">Basketball</div><div class="sport-tagline">Hoops & dunks</div></div>
+      <div class="sport-card sc-baseball" onclick="selSport('baseball',this)"><span class="sport-icon">⚾</span><div class="sport-name">Baseball</div><div class="sport-tagline">Hits & home runs</div></div>
+      <div class="sport-card sc-football" onclick="selSport('football',this)"><span class="sport-icon">🏈</span><div class="sport-name">Football</div><div class="sport-tagline">TDs & tackles</div></div>
+    </div>
+    <button class="all-sports-btn" id="all-btn" onclick="selSport('all',this)">🌍 All sports — mix it up!</button>
+    <button class="cta-btn" id="sport-cta" onclick="goCard()" disabled>Let's go! →</button>
+  </div>
+</div>
+
+<!-- ═══ PLAYER CARD ═══ -->
+<div id="s-card" class="screen">
+  <div class="pc-wrap">
+    <div class="pc-greeting" id="pc-greeting"></div>
+    <div class="pc-sub">Here's your player card!</div>
+    <div class="player-card">
+      <span class="pc-av" id="pc-av"></span>
+      <div class="pc-name" id="pc-name"></div>
+      <div class="pc-av-label" id="pc-av-label"></div>
+      <div class="pc-sport-badge" id="pc-badge"></div>
+      <div class="pc-stats">
+        <div class="pc-stat"><div class="pc-stat-val">0</div><div class="pc-stat-lbl">XP</div></div>
+        <div class="pc-stat"><div class="pc-stat-val">0</div><div class="pc-stat-lbl">Correct</div></div>
+        <div class="pc-stat"><div class="pc-stat-val">0</div><div class="pc-stat-lbl">Stars</div></div>
+      </div>
+    </div>
+    <button class="cta-btn" onclick="startHub()">Start learning! 🎯</button>
+  </div>
+</div>
+
+<!-- ═══ HUB ═══ -->
+<div id="hub" class="screen">
+  <div class="hub-header">
+    <button class="back-btn" onclick="backCard()">←</button>
+    <div class="hub-player">
+      <span class="hub-av" id="hub-av"></span>
+      <span class="hub-pname" id="hub-pname"></span>
+    </div>
+    <div class="xp-right">
+      <div class="stars-row" id="hub-stars"></div>
+      <div class="xp-pill" id="hub-xp">0 XP</div>
+    </div>
+  </div>
+  <div class="xp-bar-track"><div class="xp-bar-fill" id="xp-fill" style="width:0%"></div></div>
+  <div class="sport-strip" id="hub-strip"></div>
+  <div class="nav-grid">
+    <div class="nav-tile nt-quiz active" onclick="showSec('quiz',this)"><span class="ntile-icon">🏆</span><span class="ntile-lbl">Quiz</span></div>
+    <div class="nav-tile nt-flash" onclick="showSec('flash',this)"><span class="ntile-icon">⚡</span><span class="ntile-lbl">Cards</span></div>
+    <div class="nav-tile nt-rules" onclick="showSec('rules',this)"><span class="ntile-icon">📖</span><span class="ntile-lbl">Rules</span></div>
+    <div class="nav-tile nt-plays" onclick="showSec('plays',this)"><span class="ntile-icon">📋</span><span class="ntile-lbl">Plays</span></div>
+    <div class="nav-tile nt-challenge" onclick="showSec('challenge',this)"><span class="ntile-icon">🎯</span><span class="ntile-lbl">Tasks</span></div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz" class="section visible">
+    <div class="score-row">
+      <span class="sp sp-s" id="s-score">Score: 0/0</span>
+      <span class="sp sp-k" id="s-streak">Streak: 0 🔥</span>
+    </div>
+    <div class="q-card">
+      <div class="q-sport-tag" id="q-tag"></div>
+      <div class="q-text" id="q-text"></div>
+      <div class="q-opts" id="q-opts"></div>
+      <div class="fb-box" id="fb-box"></div>
+      <button class="next-btn" id="nxt-btn" onclick="nextQ()">Next question →</button>
+    </div>
+  </div>
+
+  <!-- FLASH -->
+  <div id="flash" class="section">
+    <div class="fc-dots" id="fc-dots"></div>
+    <div class="fc-wrap" onclick="flipCard()">
+      <div class="fc-inner" id="fc-inner">
+        <div class="fc-face fc-front"><div class="fc-sport-lbl" id="fc-sp"></div><div class="fc-term" id="fc-term"></div><div class="fc-hint">Tap to flip ✨</div></div>
+        <div class="fc-face fc-back"><div class="fc-def" id="fc-def"></div></div>
+      </div>
+    </div>
+    <div class="fc-ctrl">
+      <button class="fc-btn" onclick="fcMv(-1)">← Back</button>
+      <span class="fc-cnt" id="fc-cnt"></span>
+      <button class="fc-btn" onclick="fcMv(1)">Next →</button>
+    </div>
+  </div>
+
+  <!-- RULES -->
+  <div id="rules" class="section">
+    <div class="stabs" id="stabs"></div>
+    <div id="rlist"></div>
+  </div>
+
+  <!-- PLAYS -->
+  <div id="plays" class="section">
+    <div class="play-sport-tabs" id="play-stabs"></div>
+    <div class="play-nav" id="play-nav"></div>
+    <div class="canvas-wrap" id="canvas-wrap"><canvas id="field" class="field-canvas" height="300"></canvas></div>
+    <div class="play-info-card">
+      <div class="play-info-title" id="play-title"></div>
+      <div class="play-info-desc" id="play-desc"></div>
+      <div class="play-steps" id="play-steps"></div>
+    </div>
+    <div class="ctrl-row">
+      <button class="play-btn" id="play-btn" onclick="togglePlay()">▶ Play</button>
+      <button class="reset-btn" onclick="resetPlay()">↺ Reset</button>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+    <div class="play-legend">
+      <div class="leg"><div class="leg-dot" style="background:#3b82f6"></div>Your team</div>
+      <div class="leg"><div class="leg-dot" style="background:#ef4444"></div>Opponent</div>
+      <div class="leg"><div class="leg-dot" style="background:#f59e0b"></div>Ball</div>
+    </div>
+  </div>
+
+  <!-- CHALLENGE -->
+  <div id="challenge" class="section">
+    <div class="day-banner"><span class="day-ico">🌟</span><div><div class="day-lbl">Today's Challenges</div><div class="day-ttl">Complete tasks to earn XP!</div></div></div>
+    <div id="chlist"></div>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────
+const AVATARS=[
+  {e:'🏃',n:'Runner'},{e:'🧗',n:'Climber'},{e:'🥷',n:'Ninja'},
+  {e:'🏋️',n:'Champ'},{e:'🤖',n:'Robot'},{e:'🦁',n:'Lion'},
+  {e:'🦅',n:'Eagle'},{e:'🦈',n:'Shark'},{e:'🐺',n:'Wolf'},
+  {e:'🐢',n:'Turtle'},{e:'🦏',n:'Rhino'},{e:'🦍',n:'Gorilla'},
+];
+const SPORT_META={
+  soccer:{name:'Soccer',icon:'⚽',bg:'#EAF3DE',color:'#27500A'},
+  basketball:{name:'Basketball',icon:'🏀',bg:'#FAEEDA',color:'#633806'},
+  baseball:{name:'Baseball',icon:'⚾',bg:'#E6F1FB',color:'#0C447C'},
+  football:{name:'Football',icon:'🏈',bg:'#FBEAF0',color:'#72243E'},
+  all:{name:'All Sports',icon:'🌍',bg:'#EEEDFE',color:'#3C3489'},
+};
+const ALL_QS=[
+  {sport:'Soccer',stag:'sc-soccer',q:'What is it called when a player scores 3 goals in one game?',opts:['Hat trick','Triple shot','Grand slam','Perfect game'],ans:0,fact:'The phrase "hat trick" originally comes from cricket!'},
+  {sport:'Basketball',stag:'sc-basketball',q:'How many players from one team are on the court at a time?',opts:['4','5','6','7'],ans:1,fact:'NBA courts are 94 feet long — about 3 school buses end to end!'},
+  {sport:'Baseball',stag:'sc-baseball',q:'How many strikes does it take to get a batter out?',opts:['2','3','4','1'],ans:1,fact:'The fastest pitch ever recorded was 105.1 mph by Aroldis Chapman!'},
+  {sport:'Football',stag:'sc-football',q:'How many points is a touchdown worth?',opts:['3','4','6','7'],ans:2,fact:'The Super Bowl trophy is named after coach Vince Lombardi!'},
+  {sport:'Basketball',stag:'sc-basketball',q:'What line do players shoot from to earn free throws?',opts:['Three-point line','Foul line','Half-court','Baseline'],ans:1,fact:'The foul line is exactly 15 feet from the backboard!'},
+  {sport:'Soccer',stag:'sc-soccer',q:'How long is a standard soccer match (not counting extra time)?',opts:['60 min','80 min','90 min','120 min'],ans:2,fact:'The longest charity soccer game ever lasted over 35 hours!'},
+  {sport:'Baseball',stag:'sc-baseball',q:'How many outs does each team get per inning?',opts:['2','3','4','6'],ans:1,fact:'The longest MLB game had 26 innings and lasted over 8 hours!'},
+  {sport:'Football',stag:'sc-football',q:'What is it called when the defense tackles the QB behind the line of scrimmage?',opts:['Blitz','Sack','Fumble','Interception'],ans:1,fact:'NFL QBs get sacked about 2-3 times per game on average!'},
+];
+const ALL_FC=[
+  {sport:'Basketball',term:'Dribbling',def:'Bouncing the ball while moving. You must dribble to walk or run — no carrying!'},
+  {sport:'Soccer',term:'Offside',def:"You can't receive the ball if you're ahead of the last defender when it's passed."},
+  {sport:'Baseball',term:'Inning',def:'One round where both teams take turns batting. A full game has 9 innings.'},
+  {sport:'Football',term:'First down',def:'Gain 10 yards in 4 tries and the count resets — 4 more chances to go!'},
+  {sport:'Basketball',term:'Rebound',def:'Grabbing the ball after a missed shot. Both teams fight for rebounds!'},
+  {sport:'Soccer',term:'Corner kick',def:'When defense kicks the ball over their own goal line, the attack kicks from the corner flag.'},
+  {sport:'Baseball',term:'Home run',def:'Hit the ball over the fence in fair territory — every base runner scores!'},
+  {sport:'Football',term:'Interception',def:'A defender catches a pass meant for the other team — instant turnover!'},
+];
+const ALL_RULES={
+  Soccer:[
+    {t:'How to score a goal',b:'The entire ball must cross the goal line between the posts and under the bar. Even a centimeter counts!',f:'The fastest goal ever was scored just 2 seconds after kickoff!'},
+    {t:'Fouls and free kicks',b:"Kicking, tripping, pushing, or using hands (unless you're the goalie) earns the other team a free kick.",f:'"Set pieces" from free kicks are practiced by teams for hours every week.'},
+    {t:'Yellow and red cards',b:'Yellow = warning. Two yellows = red. A red means you leave — your team plays with 10!',f:'The first World Cup red card was shown in 1966!'},
+    {t:'The offside rule',b:"You can't be ahead of the last defender when the ball is played to you. Stay level or behind!",f:'VAR technology now checks offside down to the millimeter!'},
+  ],
+  Basketball:[
+    {t:'How scoring works',b:'Inside the arc = 2 pts. Beyond the arc = 3 pts. Free throw = 1 pt each. Most points wins!',f:'Steph Curry holds the record for most three-pointers in NBA history!'},
+    {t:'Personal fouls',b:'Illegal contact like pushing or holding is a foul. Get too many and you foul out of the game!',f:'NBA players foul out after 6 fouls. In college, it\'s only 5!'},
+    {t:'Traveling',b:"You can't take more than 1.5 steps without dribbling. You can pivot on one foot without dribbling.",f:'Refs miss about 3-4 traveling violations per game — it\'s one of the hardest to spot!'},
+    {t:'Shot clock',b:'Teams have 24 seconds (NBA) to attempt a shot or they lose the ball. Keeps the game exciting!',f:'The shot clock was invented in 1954 after a nearly scoreless game!'},
+  ],
+  Baseball:[
+    {t:'How outs work',b:'3 outs per half-inning. Strikeout, caught fly ball, or the ball reaches the base before you.',f:'An unassisted triple play has only happened 15 times in MLB history!'},
+    {t:'Balls and strikes',b:"4 balls = walk to first base. 3 strikes = out. The zone is over the plate between knees and chest.",f:"Best pitcher's count: 0 balls, 2 strikes. Best hitter's count: 3 balls, 0 strikes!"},
+    {t:'Running the bases',b:'Touch first, second, third, then home — in order! Tagged before you arrive = out.',f:'There are exactly 90 feet between each base. Every inch matters!'},
+    {t:'Home runs',b:'Hit the ball over the fence in fair territory and automatically run all bases. Every base runner scores too!',f:'Barry Bonds hit 73 home runs in 2001 — the single-season record!'},
+  ],
+  Football:[
+    {t:'Downs and distance',b:'4 tries (downs) to move 10 yards. Succeed = new set of downs. Fail = the other team gets the ball.',f:'The 4th down decision is one of the hardest calls in all of sports!'},
+    {t:'Scoring',b:'Touchdown = 6 pts + 1 or 2 extra. Field goal = 3 pts. Safety (tackled in own end zone) = 2 pts for defense.',f:'"Two-point conversion" after a TD is only tried when the game is really close!'},
+    {t:'Line of scrimmage',b:"An invisible line where each play starts. Offense can't cross it before the snap — that's a false start penalty!",f:'The word "scrimmage" comes from "skirmish" — an old word for a small battle!'},
+    {t:'Penalties',b:'Rule breaks earn 5, 10, or 15-yard penalties against the offending team.',f:'"False start" — moving before the snap — is the most common NFL penalty!'},
+  ],
+};
+const PLAYS={
+  soccer:[
+    {name:'Give and go',desc:'Player 1 passes to Player 2, then sprints into space. Player 2 immediately returns the pass into the run. Simple — but deadly against a flat defense!',steps:['Pass to teammate','Sprint into space','Receive the return pass','Continue the run'],cols:['#C0DD97','#85B7EB','#C0DD97','#85B7EB'],dur:4.5,
+      draw:(ctx,t)=>{drawSoccerField(ctx);const p1s={x:160,y:200},p2={x:320,y:140},p1e={x:430,y:110},re={x:470,y:128};const ph1=clamp(t/1.2),ph2=clamp((t-1.2)/1.0),ph3=clamp((t-2.2)/1.0),ph4=clamp((t-3.2)/0.8);drawDash(ctx,[{x:320,y:140},p1e],'#fff',ph2);drawDash(ctx,[re,{x:560,y:100}],'#fff',ph4);if(ph3>0)drawPass(ctx,{x:320,y:140},re,ph3,'#f59e0b');if(ph1>0)drawPass(ctx,p1s,p2,ph1,'#f59e0b');const px=ph2<1?p1s.x:lerp(p1s.x,p1e.x,ph2),py=ph2<1?p1s.y:lerp(p1s.y,p1e.y,ph2);drawPl(ctx,p2.x,p2.y,'#3b82f6','2');drawPl(ctx,px,py,'#3b82f6','1');drawPl(ctx,530,185,'#ef4444','D');drawPl(ctx,490,148,'#ef4444','D');const bx=ph1<1?lerp(p1s.x,p2.x,ph1):(ph3>0?lerp(p2.x,re.x,ph3):p2.x),by=ph1<1?lerp(p1s.y,p2.y,ph1):(ph3>0?lerp(p2.y,re.y,ph3):p2.y);drawBall(ctx,bx,by);lbl(ctx,['Pass!','Sprint!','Return!','Keep going!'][t<1.2?0:t<2.2?1:t<3.2?2:3]);},},
+    {name:'Overlap run',desc:'A fullback sprints past the winger on the outside creating a 2v1 overlap. The winger passes wide and the fullback delivers a cross into the box.',steps:['Winger holds ball','Fullback overlaps outside','Pass wide to run','Cross into the box'],cols:['#C0DD97','#85B7EB','#C0DD97','#FAC775'],dur:4.5,
+      draw:(ctx,t)=>{drawSoccerField(ctx);const w={x:200,y:260},fb={x:160,y:230},fbe={x:490,y:282},cx={x:520,y:158};const ph2=clamp((t-1.0)/1.2),ph3=clamp((t-2.2)/1.0),ph4=clamp((t-3.2)/1.0);drawDash(ctx,[{x:160,y:230},fbe],'#fff',clamp(t/1.0));if(ph3>0)drawPass(ctx,w,fbe,ph3,'#f59e0b');if(ph4>0)drawPass(ctx,fbe,cx,ph4,'#f59e0b');const fbx=lerp(fb.x,fbe.x,clamp(t/2.2)),fby=lerp(fb.y,fbe.y,clamp(t/2.2));drawPl(ctx,w.x,w.y,'#3b82f6','W');drawPl(ctx,fbx,fby,'#3b82f6','F');drawPl(ctx,425,218,'#ef4444','D');drawPl(ctx,385,188,'#ef4444','D');const bx=ph3<1?(ph3>0?lerp(w.x,fbe.x,ph3):w.x):(ph4>0?lerp(fbe.x,cx.x,ph4):fbe.x),by=ph3<1?(ph3>0?lerp(w.y,fbe.y,ph3):w.y):(ph4>0?lerp(fbe.y,cx.y,ph4):fbe.y);drawBall(ctx,bx,by);lbl(ctx,['Winger holds','Fullback overlaps!','Pass wide!','Cross it in!'][t<1.0?0:t<2.2?1:t<3.2?2:3]);},},
+    {name:'3v2 counter attack',desc:'Win the ball and immediately launch forward 3v2. The center striker holds while wings spread wide, then threads the final pass at the right moment.',steps:['Win the ball','3 attackers sprint','Hold shape, wings spread','Thread the final pass'],cols:['#FAC775','#85B7EB','#C0DD97','#FAC775'],dur:4.5,
+      draw:(ctx,t)=>{drawSoccerField(ctx);const p1={x:180,y:160},p2={x:180,y:205},p3={x:180,y:118};const run=clamp(t/2.0),pass=clamp((t-3.0)/1.0);drawDash(ctx,[p1,{x:365,y:160}],'#fff',run);drawDash(ctx,[p2,{x:365,y:222}],'#fff',run);drawDash(ctx,[p3,{x:365,y:100}],'#fff',run);if(pass>0)drawPass(ctx,{x:365,y:160},{x:480,y:100},pass,'#f59e0b');drawPl(ctx,lerp(p1.x,365,run),lerp(p1.y,160,run),'#3b82f6','1');drawPl(ctx,lerp(p2.x,365,run),lerp(p2.y,222,run),'#3b82f6','2');drawPl(ctx,lerp(p3.x,365,run),lerp(p3.y,100,run),'#3b82f6','3');drawPl(ctx,lerp(500,432,clamp(t/1.5)),160,'#ef4444','D');drawPl(ctx,lerp(480,442,clamp(t/1.5)),118,'#ef4444','D');const mx=lerp(p1.x,365,run),my=lerp(p1.y,160,run);const bx=pass>0?lerp(mx,480,pass):mx,by=pass>0?lerp(my,100,pass):my;drawBall(ctx,bx,by);lbl(ctx,['Ball won!','Sprint forward!','Hold shape...','Thread it!'][t<0.5?0:t<2.0?1:t<3.0?2:3]);},},
+  ],
+  basketball:[
+    {name:'Give and go',desc:"Guard passes to the forward and cuts hard toward the basket. The forward gives it right back — the guard catches in stride and lays it up!",steps:['Guard passes to forward','Guard cuts to basket','Forward returns pass','Lay-up!'],cols:['#C0DD97','#85B7EB','#C0DD97','#FAC775'],dur:4.0,
+      draw:(ctx,t)=>{drawBballCourt(ctx);const g={x:220,y:195},f={x:380,y:158},ge={x:460,y:238};const ph1=clamp(t/1.0),ph2=clamp((t-1.0)/1.0),ph3=clamp((t-2.0)/1.0);drawDash(ctx,[g,ge],'#fff',ph2);if(ph1>0)drawPass(ctx,g,f,ph1,'#f59e0b');if(ph3>0)drawPass(ctx,f,ge,ph3,'#f59e0b');drawPl(ctx,f.x,f.y,'#3b82f6','F');drawPl(ctx,ph2>0?lerp(g.x,ge.x,ph2):g.x,ph2>0?lerp(g.y,ge.y,ph2):g.y,'#3b82f6','G');drawPl(ctx,320,160,'#ef4444','D');drawPl(ctx,402,222,'#ef4444','D');const bx=ph1<1?lerp(g.x,f.x,ph1):(ph3>0?lerp(f.x,ge.x,ph3):f.x),by=ph1<1?lerp(g.y,f.y,ph1):(ph3>0?lerp(f.y,ge.y,ph3):f.y);drawBall(ctx,bx,by);lbl(ctx,['Pass to forward!','Cut to basket!','Return pass!','Lay it up!'][t<1?0:t<2?1:t<3?2:3]);},},
+    {name:'Pick and roll',desc:"The big sets a screen (pick) on the ball-handler's defender. The guard drives off the screen. The big then rolls to the basket for an easy pass.",steps:['Big sets the screen','Guard drives off screen','Defender gets caught','Big rolls to basket'],cols:['#C0DD97','#85B7EB','#FAC775','#C0DD97'],dur:4.5,
+      draw:(ctx,t)=>{drawBballCourt(ctx);const g={x:242,y:190},big={x:310,y:190},ge={x:422,y:200},bige={x:445,y:242};const ph2=clamp((t-1.5)/1.2),ph3=clamp((t-2.8)/1.2);drawDash(ctx,[g,ge],'#fff',ph2);drawDash(ctx,[big,bige],'#fff',ph3);const gx=lerp(g.x,ge.x,ph2),gy=lerp(g.y,ge.y,ph2);const bigx=lerp(big.x,bige.x,ph3),bigy=lerp(big.y,bige.y,ph3);if(ph3>0.5)drawPass(ctx,{x:gx,y:gy},{x:bigx,y:bigy},clamp((t-3.5)/0.7),'#f59e0b');drawPl(ctx,big.x,big.y,'#3b82f6','C');drawPl(ctx,gx,gy,'#3b82f6','G');drawPl(ctx,lerp(282,360,clamp(t/3)),175,'#ef4444','D');drawPl(ctx,392,228,'#ef4444','D');const bpass=clamp((t-3.5)/0.7);const bx=bpass>0?lerp(gx,bigx,bpass):gx,by=bpass>0?lerp(gy,bigy,bpass):gy;drawBall(ctx,bx,by);lbl(ctx,['Big sets screen!','Guard drives!','Defender caught!','Big rolls open!'][t<1.2?0:t<2.4?1:t<3.2?2:3]);},},
+    {name:'Fast break 3v2',desc:'Steal or rebound — push the ball up court before the defense can set. Middle player keeps the ball, wings spread wide, then kick out and finish.',steps:['Get the ball','Push up court fast','Wings spread wide','Kick out and finish'],cols:['#FAC775','#85B7EB','#C0DD97','#FAC775'],dur:4.0,
+      draw:(ctx,t)=>{drawBballCourt(ctx);const c={x:180,y:190},l={x:180,y:232},r={x:180,y:150};const run=clamp(t/2.0),pass=clamp((t-2.8)/1.0);drawDash(ctx,[c,{x:400,y:190}],'#fff',run);drawDash(ctx,[l,{x:400,y:252}],'#fff',run);drawDash(ctx,[r,{x:400,y:132}],'#fff',run);const cx=lerp(c.x,400,run),cy=lerp(c.y,190,run);if(pass>0)drawPass(ctx,{x:cx,y:cy},{x:400,y:132},pass,'#f59e0b');drawPl(ctx,cx,cy,'#3b82f6','1');drawPl(ctx,lerp(l.x,400,run),lerp(l.y,252,run),'#3b82f6','2');drawPl(ctx,lerp(r.x,400,run),lerp(r.y,132,run),'#3b82f6','3');drawPl(ctx,lerp(500,432,clamp(t/1.5)),175,'#ef4444','D');drawPl(ctx,lerp(520,452,clamp(t/1.5)),210,'#ef4444','D');const bx=pass>0?lerp(cx,400,pass):cx,by=pass>0?lerp(cy,132,pass):cy;drawBall(ctx,bx,by);lbl(ctx,['Rebound!','Push it fast!','Spread the floor!','Kick out!'][t<0.5?0:t<2.0?1:t<2.8?2:3]);},},
+  ],
+  baseball:[
+    {name:'Throw to cutoff man',desc:"Ball hit deep to the outfield. The outfielder can't reach home directly — they hit the cutoff man (infielder), who relays it home to nail the runner!",steps:['Ball hit to outfield','Outfielder fields it','Throw to cutoff man','Cutoff relays home'],cols:['#FAC775','#C0DD97','#85B7EB','#FAC775'],dur:5.0,
+      draw:(ctx,t)=>{drawBsballField(ctx);const of1={x:200,y:80},cut={x:332,y:188},home={x:342,y:288};const ph2=clamp((t-1.5)/1.2),ph3=clamp((t-3.0)/1.5);if(ph2>0)drawPass(ctx,of1,cut,ph2,'#f59e0b');if(ph3>0)drawPass(ctx,cut,home,ph3,'#f59e0b');drawDash(ctx,[{x:422,y:80},{x:342,y:80},{x:342,y:288}],'#fff',clamp(t/4.5));drawPl(ctx,of1.x,of1.y,'#3b82f6','OF','sq');drawPl(ctx,cut.x,cut.y,'#3b82f6','2B','sq');drawPl(ctx,home.x+18,home.y,'#3b82f6','C','sq');drawPl(ctx,lerp(422,342,clamp(t/4.5)),lerp(80,288,clamp(t/4.5)),'#ef4444','R');let bx,by;if(ph2<0.01){bx=of1.x;by=of1.y;}else if(ph2<1){bx=lerp(of1.x,cut.x,ph2);by=lerp(of1.y,cut.y,ph2);}else if(ph3<1){bx=lerp(cut.x,home.x,ph3);by=lerp(cut.y,home.y,ph3);}else{bx=home.x;by=home.y;}drawBall(ctx,bx,by);lbl(ctx,['Ball hit deep!','OF fields it!','Hit the cutoff!','Relay home!'][t<0.5?0:t<1.5?1:t<3.0?2:3]);},},
+    {name:'Double play 6-4-3',desc:'Grounder to short (6). Short throws to second (4) for one out — second throws to first (3) to complete the double play. Two outs, one pitch!',steps:['Grounder to shortstop','Throw to second base','Out at second!','Fire to first!'],cols:['#FAC775','#85B7EB','#C0DD97','#FAC775'],dur:4.5,
+      draw:(ctx,t)=>{drawBsballField(ctx);const ss={x:258,y:183},sec={x:342,y:153},fst={x:432,y:198};const ph1=clamp(t/1.0),ph2=clamp((t-1.2)/1.0),ph3=clamp((t-2.5)/1.5);drawDash(ctx,[{x:342,y:288},{x:258,y:183}],'#f59e0b',ph1);if(ph2>0)drawPass(ctx,ss,sec,ph2,'#f59e0b');if(ph3>0)drawPass(ctx,sec,fst,ph3,'#f59e0b');drawDash(ctx,[fst,{x:432,y:100}],'#fff',clamp(t/3.5));drawPl(ctx,ss.x,ss.y,'#3b82f6','SS','sq');drawPl(ctx,sec.x,sec.y,'#3b82f6','2B','sq');drawPl(ctx,fst.x,fst.y,'#3b82f6','1B','sq');drawPl(ctx,lerp(342,258,ph1*0.5),lerp(288,242,ph1*0.5),'#ef4444','R');let bx,by;if(ph2<0.01){bx=ss.x;by=ss.y;}else if(ph2<1){bx=lerp(ss.x,sec.x,ph2);by=lerp(ss.y,sec.y,ph2);}else if(ph3<1){bx=lerp(sec.x,fst.x,ph3);by=lerp(sec.y,fst.y,ph3);}else{bx=fst.x;by=fst.y;}drawBall(ctx,bx,by);lbl(ctx,['Grounder to SS!','Throw to second!','Out at second!','Fire to first!'][t<0.5?0:t<1.5?1:t<2.8?2:3]);},},
+    {name:'Hit and run',desc:"Runner on first breaks for second on the pitch. Batter must swing to protect the runner. If the ball goes through the gap, the runner might score from first!",steps:['Runner breaks for second','Batter must swing','Ball goes through gap','Runner scores!'],cols:['#85B7EB','#FAC775','#C0DD97','#C0DD97'],dur:4.5,
+      draw:(ctx,t)=>{drawBsballField(ctx);const fst={x:432,y:198},sec={x:342,y:153},gap={x:178,y:118};const run=clamp(t/2.0),roll=clamp((t-1.5)/2.0),score=clamp((t-3.0)/1.5);drawDash(ctx,[fst,sec,{x:262,y:183}],'#fff',run);if(roll>0)drawPass(ctx,{x:342,y:288},{x:gap.x,y:gap.y},roll,'#f59e0b');if(score>0)drawDash(ctx,[{x:262,y:183},{x:262,y:288},{x:342,y:288}],'#fff',score);const rx=run<0.5?lerp(fst.x,sec.x,run*2):lerp(sec.x,262,clamp((run-0.5)*2)),ry=run<0.5?lerp(fst.y,sec.y,run*2):lerp(sec.y,183,clamp((run-0.5)*2));drawPl(ctx,rx,ry,'#ef4444','R');drawPl(ctx,432,198,'#3b82f6','1B','sq');drawPl(ctx,342,153,'#3b82f6','2B','sq');drawPl(ctx,258,183,'#3b82f6','SS','sq');const bx=roll>0?lerp(342,gap.x,roll):342,by=roll>0?lerp(288,gap.y,roll):288;drawBall(ctx,bx,by);lbl(ctx,['Runner goes!','Batter swings!','Ball in the gap!','Runner scores!'][t<0.5?0:t<1.5?1:t<3.0?2:3]);},},
+  ],
+};
+const CHALLENGES=[
+  {ico:'📝',t:'Stat collector',d:'easy',desc:'Watch any game and write down 5 stats — like points, fouls, or assists. Explain what each one means.'},
+  {ico:'💬',t:'Rule detective',d:'medium',desc:"Find one rule you didn't know before and teach it to a friend or family member in your own words."},
+  {ico:'📸',t:'Position map',d:'easy',desc:'Draw a field or court and label where each position plays. Add one job each position has.'},
+  {ico:'🎙',t:'Sportscaster',d:'hard',desc:'Watch 5 minutes of a game and write a mini play-by-play like a real commentator — use correct terms!'},
+  {ico:'🔍',t:'Record hunter',d:'medium',desc:'Look up one all-time record in any sport. How long did the previous record stand before it was broken?'},
+  {ico:'🧠',t:'Invent a rule',d:'hard',desc:'Come up with one new rule for any sport that would make it more fun or fair. Write why you chose it!'},
+];
+
+// ── PLAYER STATE ──────────────────────────────────────────────────────
+let P={name:'',emoji:'',avName:'',sport:'',xp:0,score:0,total:0,streak:0};
+let qi=0,answered=false,fci=0,fcFlipped=false,fcSeen=new Set(),completedCh=new Set();
+let activeQs=[],activeFCs=[],activeRS='Soccer';
+let playSport='soccer',playIdx=0,animT=0,playing=false,raf=null,lastTs=null;
+
+// ── SCREENS ───────────────────────────────────────────────────────────
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+// ── STEP 1 ────────────────────────────────────────────────────────────
+function onName(v){
+  const t=v.trim();
+  document.getElementById('np-text').textContent=t?'Hey, '+t+'! 👋':'Who are you?';
+  document.getElementById('name-cta').disabled=t.length<2;
+}
+function goStep(n){
+  if(n===2){P.name=document.getElementById('name-field').value.trim();buildAvatars();show('s2');}
+  else if(n===3) show('s3');
+}
+function buildAvatars(){
+  document.getElementById('av-grid').innerHTML=AVATARS.map((a,i)=>
+    `<div class="av-card" id="av${i}" onclick="selAv(${i})"><span class="av-emoji">${a.e}</span><div class="av-name">${a.n}</div></div>`).join('');
+}
+function selAv(i){
+  document.querySelectorAll('.av-card').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('av'+i).classList.add('sel');
+  P.emoji=AVATARS[i].e; P.avName=AVATARS[i].n;
+  document.getElementById('av-cta').disabled=false;
+  document.getElementById('np-icon').textContent=P.emoji;
+}
+
+// ── STEP 3 ────────────────────────────────────────────────────────────
+let selSportEl=null;
+function selSport(s,el){
+  if(selSportEl) selSportEl.classList.remove('sel');
+  el.classList.add('sel'); selSportEl=el; P.sport=s;
+  document.getElementById('sport-cta').disabled=false;
+  if(s!=='all') document.getElementById('all-btn').classList.remove('sel');
+}
+function goCard(){
+  const sm=SPORT_META[P.sport];
+  document.getElementById('pc-greeting').textContent='Nice to meet you, '+P.name+'! 🎉';
+  document.getElementById('pc-av').textContent=P.emoji;
+  document.getElementById('pc-name').textContent=P.name;
+  document.getElementById('pc-av-label').textContent=P.avName+' · Rookie';
+  const b=document.getElementById('pc-badge');
+  b.style.background=sm.bg; b.style.color=sm.color;
+  b.innerHTML=`<span style="font-size:18px">${sm.icon}</span> ${sm.name}`;
+  show('s-card');
+}
+
+// ── HUB LAUNCH ────────────────────────────────────────────────────────
+function startHub(){
+  const sm=SPORT_META[P.sport];
+  document.getElementById('hub-av').textContent=P.emoji;
+  document.getElementById('hub-pname').textContent=P.name;
+  const strip=document.getElementById('hub-strip');
+  strip.style.background=sm.bg; strip.style.color=sm.color;
+  strip.innerHTML=`<span style="font-size:16px">${sm.icon}</span> Playing: ${sm.name}`;
+  if(P.sport==='all'){activeQs=[...ALL_QS];activeFCs=[...ALL_FC];}
+  else{
+    activeQs=ALL_QS.filter(q=>q.sport.toLowerCase()===P.sport);
+    activeFCs=ALL_FC.filter(f=>f.sport.toLowerCase()===P.sport);
+    if(!activeQs.length) activeQs=[...ALL_QS];
+    if(!activeFCs.length) activeFCs=[...ALL_FC];
+  }
+  activeRS=P.sport==='all'?'Soccer':sm.name;
+  qi=0;fci=0;fcSeen=new Set();completedCh=new Set();
+  show('hub'); showSec('quiz',document.querySelector('.nt-quiz'));
+  renderQ(); updateXP();
+  initPlays();
+}
+function backCard(){show('s-card');}
+function updateXP(){
+  const pct=Math.min(P.xp,100);
+  document.getElementById('xp-fill').style.width=pct+'%';
+  document.getElementById('hub-xp').textContent=P.xp+' XP';
+  const stars=Math.floor(P.xp/20);
+  document.getElementById('hub-stars').innerHTML=Array.from({length:5},(_,i)=>`<span class="${i<stars?'son':'soff'}">★</span>`).join('');
+}
+
+// ── SECTIONS ──────────────────────────────────────────────────────────
+function showSec(id,tile){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('visible'));
+  document.getElementById(id).classList.add('visible');
+  document.querySelectorAll('.nav-tile').forEach(t=>t.classList.remove('active'));
+  if(tile) tile.classList.add('active');
+  if(id==='flash') renderFC();
+  if(id==='rules') renderRules(activeRS);
+  if(id==='challenge') renderChallenges();
+  if(id==='plays'){loadPlay(playSport,playIdx);}
+}
+
+// ── QUIZ ──────────────────────────────────────────────────────────────
+function renderQ(){
+  const d=activeQs[qi%activeQs.length];
+  const tag=document.getElementById('q-tag');
+  tag.className='q-sport-tag '+d.stag; tag.textContent=d.sport;
+  document.getElementById('q-text').textContent=d.q;
+  const fb=document.getElementById('fb-box'); fb.style.display='none'; fb.className='fb-box';
+  document.getElementById('nxt-btn').style.display='none';
+  answered=false;
+  document.getElementById('q-opts').innerHTML=d.opts.map((o,i)=>`<button class="opt" onclick="checkAns(${i})">${o}</button>`).join('');
+  document.getElementById('s-score').textContent=`Score: ${P.score}/${P.total}`;
+  document.getElementById('s-streak').textContent=`Streak: ${P.streak} 🔥`;
+}
+function checkAns(i){
+  if(answered) return; answered=true;
+  const d=activeQs[qi%activeQs.length];
+  document.querySelectorAll('.opt').forEach((b,idx)=>{b.disabled=true;if(idx===d.ans)b.classList.add('correct');else if(idx===i&&i!==d.ans)b.classList.add('wrong');});
+  P.total++;
+  const fb=document.getElementById('fb-box');
+  if(i===d.ans){P.score++;P.streak++;P.xp=Math.min(P.xp+10,100);fb.className='fb-box fb-y';fb.textContent='🎉 Correct! '+d.fact;}
+  else{P.streak=0;fb.className='fb-box fb-n';fb.textContent='😅 Not quite — check the green answer! '+d.fact;}
+  fb.style.display='block';
+  document.getElementById('s-score').textContent=`Score: ${P.score}/${P.total}`;
+  document.getElementById('s-streak').textContent=`Streak: ${P.streak} 🔥`;
+  document.getElementById('nxt-btn').style.display='block';
+  updateXP();
+  if(P.xp>=100) confetti();
+}
+function nextQ(){qi++;renderQ();}
+
+// ── FLASHCARDS ────────────────────────────────────────────────────────
+function renderFC(){
+  fcFlipped=false; document.getElementById('fc-inner').classList.remove('flipped');
+  const c=activeFCs[fci%activeFCs.length];
+  document.getElementById('fc-sp').textContent=c.sport;
+  document.getElementById('fc-term').textContent=c.term;
+  document.getElementById('fc-def').textContent=c.def;
+  document.getElementById('fc-cnt').textContent=(fci%activeFCs.length+1)+' of '+activeFCs.length;
+  fcSeen.add(fci%activeFCs.length);
+  document.getElementById('fc-dots').innerHTML=activeFCs.map((_,i)=>`<div class="fc-dot${fcSeen.has(i)?' seen':''}"></div>`).join('');
+}
+function flipCard(){fcFlipped=!fcFlipped;document.getElementById('fc-inner').classList.toggle('flipped',fcFlipped);if(fcFlipped){P.xp=Math.min(P.xp+2,100);updateXP();}}
+function fcMv(d){fci=(fci+d+activeFCs.length*10)%activeFCs.length;renderFC();}
+
+// ── RULES ─────────────────────────────────────────────────────────────
+function renderRules(sport){
+  activeRS=sport;
+  document.getElementById('stabs').innerHTML=Object.keys(ALL_RULES).map(s=>`<button class="stab${s===sport?' on':''}" onclick="renderRules('${s}')">${s}</button>`).join('');
+  document.getElementById('rlist').innerHTML=ALL_RULES[sport].map((r,i)=>
+    `<div class="rule-card" id="rc${i}"><div class="rule-hdr" onclick="this.parentElement.classList.toggle('open')"><span class="rule-title">${r.t}</span><span class="rule-chev">›</span></div><div class="rule-body">${r.b}<div class="fact-box"><div class="fact-lbl">Did you know?</div>${r.f}</div></div></div>`).join('');
+}
+
+// ── PLAYS ─────────────────────────────────────────────────────────────
+const canvas=document.getElementById('field');
+const ctx=canvas.getContext('2d');
+canvas.width=680; canvas.height=300;
+
+function lerp(a,b,t){return a+(b-a)*Math.max(0,Math.min(1,t));}
+function clamp(t){return Math.max(0,Math.min(1,t));}
+
+function drawSoccerField(ctx){
+  ctx.fillStyle='#2d7a27';ctx.fillRect(0,0,680,300);
+  for(let i=0;i<10;i++){ctx.fillStyle=i%2?'#2d7a27':'#2a7024';ctx.fillRect(i*68,0,68,300);}
+  ctx.strokeStyle='rgba(255,255,255,0.6)';ctx.lineWidth=1.5;
+  ctx.strokeRect(30,18,620,264);ctx.beginPath();ctx.moveTo(340,18);ctx.lineTo(340,282);ctx.stroke();
+  ctx.beginPath();ctx.arc(340,150,48,0,Math.PI*2);ctx.stroke();
+  ctx.strokeRect(560,94,88,112);ctx.strokeRect(30,94,88,112);
+  ctx.fillStyle='rgba(255,255,255,0.8)';ctx.fillRect(338,148,4,4);
+}
+function drawBballCourt(ctx){
+  ctx.fillStyle='#c8922a';ctx.fillRect(0,0,680,300);
+  ctx.strokeStyle='rgba(255,255,255,0.5)';ctx.lineWidth=1.5;
+  ctx.strokeRect(20,20,640,260);ctx.beginPath();ctx.moveTo(340,20);ctx.lineTo(340,280);ctx.stroke();
+  ctx.beginPath();ctx.arc(340,150,48,0,Math.PI*2);ctx.stroke();
+  ctx.strokeRect(530,76,130,148);ctx.strokeRect(20,76,130,148);
+  ctx.beginPath();ctx.arc(590,150,58,Math.PI*0.5,Math.PI*1.5);ctx.stroke();
+  ctx.beginPath();ctx.arc(90,150,58,Math.PI*1.5,Math.PI*0.5);ctx.stroke();
+}
+function drawBsballField(ctx){
+  ctx.fillStyle='#5a8f3c';ctx.fillRect(0,0,680,300);
+  ctx.fillStyle='#8fbc5a';ctx.beginPath();ctx.arc(342,288,218,Math.PI*1.12,Math.PI*1.88);ctx.lineTo(342,288);ctx.fill();
+  ctx.fillStyle='#c2a55a';ctx.beginPath();ctx.moveTo(342,288);ctx.lineTo(180,128);ctx.lineTo(342,153);ctx.lineTo(504,128);ctx.closePath();ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.7)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(342,288);ctx.lineTo(180,128);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(342,288);ctx.lineTo(504,128);ctx.stroke();
+  [432,342,252,342].forEach((x,i)=>{const y=[198,153,198,288][i];ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);ctx.fillStyle='#fff';ctx.fillRect(-7,-7,14,14);ctx.restore();});
+}
+function drawPass(ctx,a,b,t,color){
+  if(t<=0)return;const ex=lerp(a.x,b.x,t),ey=lerp(a.y,b.y,t);
+  const ang=Math.atan2(b.y-a.y,b.x-a.x);
+  ctx.save();ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.setLineDash([]);
+  ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(ex,ey);ctx.stroke();
+  if(t>0.15){ctx.fillStyle=color;ctx.beginPath();ctx.translate(ex,ey);ctx.rotate(ang);ctx.moveTo(0,0);ctx.lineTo(-10,-5);ctx.lineTo(-10,5);ctx.closePath();ctx.fill();}
+  ctx.restore();
+}
+function drawDash(ctx,pts,color,t){
+  if(t<=0||pts.length<2)return;
+  ctx.save();ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.setLineDash([5,4]);ctx.globalAlpha=0.7;
+  const total=pts.reduce((s,p,i)=>i===0?s:s+Math.hypot(p.x-pts[i-1].x,p.y-pts[i-1].y),0);
+  let rem=total*t;ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
+  for(let i=1;i<pts.length;i++){const seg=Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y);if(rem>=seg){ctx.lineTo(pts[i].x,pts[i].y);rem-=seg;}else{const f=rem/seg;ctx.lineTo(pts[i-1].x+f*(pts[i].x-pts[i-1].x),pts[i-1].y+f*(pts[i].y-pts[i-1].y));break;}}
+  ctx.stroke();ctx.restore();
+}
+function drawPl(ctx,x,y,color,label,shape){
+  ctx.save();
+  if(shape==='sq'){ctx.fillStyle=color;ctx.fillRect(x-12,y-12,24,24);ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.strokeRect(x-12,y-12,24,24);}
+  else{ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,13,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();}
+  ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(label,x,y+0.5);
+  ctx.restore();
+}
+function drawBall(ctx,x,y){ctx.save();ctx.fillStyle='#f59e0b';ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();ctx.restore();}
+function lbl(ctx,text){
+  ctx.save();ctx.font='500 13px sans-serif';const w=ctx.measureText(text).width+22;
+  ctx.fillStyle='rgba(0,0,0,0.55)';ctx.beginPath();ctx.roundRect(340-w/2,10,w,24,5);ctx.fill();
+  ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,340,22);ctx.restore();
+}
+
+function getPlay(){return PLAYS[playSport][playIdx];}
+function renderPlay(){
+  const play=getPlay();ctx.clearRect(0,0,680,300);play.draw(ctx,animT);
+  document.getElementById('prog-fill').style.width=(animT/play.dur*100)+'%';
+  const si=Math.min(Math.floor(animT/play.dur*play.steps.length),play.steps.length-1);
+  document.querySelectorAll('.pstep').forEach((c,i)=>{c.style.opacity=i<=si?'1':'0.35';c.style.fontWeight=i===si?'800':'600';});
+}
+function animLoop(ts){
+  if(lastTs===null) lastTs=ts;const dt=(ts-lastTs)/1000;lastTs=ts;
+  const play=getPlay();animT=Math.min(animT+dt*0.9,play.dur);
+  renderPlay();
+  if(animT<play.dur) raf=requestAnimationFrame(animLoop);
+  else{playing=false;lastTs=null;const b=document.getElementById('play-btn');b.textContent='↺ Replay';b.classList.remove('pause');}
+}
+function togglePlay(){
+  const b=document.getElementById('play-btn');
+  if(animT>=getPlay().dur){animT=0;renderPlay();}
+  if(playing){playing=false;cancelAnimationFrame(raf);lastTs=null;b.textContent='▶ Play';b.classList.remove('pause');}
+  else{playing=true;b.textContent='⏸ Pause';b.classList.add('pause');raf=requestAnimationFrame(animLoop);}
+}
+function resetPlay(){cancelAnimationFrame(raf);playing=false;lastTs=null;animT=0;const b=document.getElementById('play-btn');b.textContent='▶ Play';b.classList.remove('pause');renderPlay();}
+
+function loadPlay(sport,idx){
+  playSport=sport;playIdx=idx;
+  cancelAnimationFrame(raf);playing=false;lastTs=null;animT=0;
+  const b=document.getElementById('play-btn');b.textContent='▶ Play';b.classList.remove('pause');
+  const play=getPlay();
+  document.getElementById('play-title').textContent=play.name;
+  document.getElementById('play-desc').textContent=play.desc;
+  document.getElementById('play-steps').innerHTML=play.steps.map((s,i)=>`<span class="pstep" style="background:${play.cols[i]}33;color:${play.cols[i]};border:1px solid ${play.cols[i]}66;opacity:0.35">${i+1}. ${s}</span>`).join('');
+  const wrap=document.getElementById('canvas-wrap');
+  wrap.className='canvas-wrap'+(sport==='basketball'?' bball':sport==='baseball'?' bsball':'');
+  buildPlayNav();
+  renderPlay();
+}
+function buildPlayNav(){
+  document.getElementById('play-stabs').innerHTML=Object.keys(PLAYS).map(s=>`<button class="pstab${s===playSport?' on':''}" onclick="loadPlay('${s}',0);buildPlayNav()">${s.charAt(0).toUpperCase()+s.slice(1)}</button>`).join('');
+  document.getElementById('play-nav').innerHTML=PLAYS[playSport].map((p,i)=>`<button class="pnav${i===playIdx?' on':''}" onclick="loadPlay('${playSport}',${i})">${p.name}</button>`).join('');
+}
+function initPlays(){loadPlay('soccer',0);}
+
+// ── CHALLENGES ────────────────────────────────────────────────────────
+function renderChallenges(){
+  document.getElementById('chlist').innerHTML=CHALLENGES.map((c,i)=>
+    `<div class="ch-card"><div class="ch-top"><span class="ch-ttl">${c.ico} ${c.t}</span><span class="dbadge d-${c.d[0]}">${c.d}</span></div><div class="ch-desc">${c.desc}</div><button class="ch-btn${completedCh.has(i)?' done':''}" onclick="completeC(${i},this)">${completedCh.has(i)?'✓ Done!':'Mark as done'}</button></div>`).join('');
+}
+function completeC(i,btn){
+  if(completedCh.has(i))return;completedCh.add(i);btn.className='ch-btn done';btn.textContent='✓ Done!';
+  P.xp=Math.min(P.xp+15,100);updateXP();if(P.xp>=100)confetti();
+}
+
+// ── CONFETTI ──────────────────────────────────────────────────────────
+function confetti(){
+  const colors=['#185FA5','#3B6D11','#EF9F27','#E24B4A','#7F77DD','#D4537E'];
+  for(let i=0;i<60;i++){
+    const el=document.createElement('div');el.className='confetti-piece';
+    el.style.cssText=`left:${Math.random()*100}vw;background:${colors[Math.floor(Math.random()*colors.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>0.5?'50%':'2px'};animation-duration:${2+Math.random()*2}s;animation-delay:${Math.random()*0.5}s;`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),4000);
+  }
+}
+
+// init
+buildAvatars();
+</script>
+</body>
+</html>
