@@ -206,8 +206,8 @@ body {
 
 /* ─── NAV GRID ─── */
 .nav-grid {
-  display: grid; grid-template-columns: repeat(5, 1fr);
-  gap: 8px; padding: 12px 16px 12px;
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  gap: 6px; padding: 12px 12px 12px;
 }
 .nav-tile {
   border-radius: 14px; padding: 11px 4px 9px;
@@ -330,6 +330,67 @@ body {
 .ch-btn:hover { background: var(--brand); color: #fff; }
 .ch-btn.done { background: var(--green-light); border-color: var(--green); color: #27500A; }
 
+/* PLAY DESIGNER */
+.pd-mode-tabs{display:flex;gap:8px;margin-bottom:12px;}
+.pd-mtab{flex:1;padding:9px;border-radius:12px;border:1.5px solid var(--border-2);background:var(--bg);color:var(--text-2);font-size:13px;font-family:var(--font);font-weight:700;cursor:pointer;text-align:center;transition:all .15s;}
+.pd-mtab.on{background:var(--brand);color:#fff;border-color:var(--brand);}
+.pd-pane{display:none;}.pd-pane.active{display:block;}
+.admin-lock{text-align:center;padding:1.5rem 0;}
+.lock-icon{font-size:44px;margin-bottom:12px;}
+.lock-title{font-family:var(--font);font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px;}
+.lock-sub{font-size:13px;color:var(--text-2);margin-bottom:1.25rem;}
+.pin-row{display:flex;gap:10px;justify-content:center;margin-bottom:14px;}
+.pin-dot{width:14px;height:14px;border-radius:50%;background:var(--border-2);transition:background .2s;}
+.pin-dot.filled{background:var(--brand);}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:200px;margin:0 auto;}
+.nkey{padding:14px;border-radius:12px;border:1.5px solid var(--border-2);background:var(--bg);color:var(--text);font-family:var(--font);font-size:18px;font-weight:700;cursor:pointer;text-align:center;transition:all .13s;}
+.nkey:hover{background:var(--brand-light);color:var(--brand);}
+.pin-err{font-size:13px;color:var(--red);text-align:center;margin-top:10px;min-height:18px;font-weight:600;}
+.d-tip{font-size:12px;color:var(--text-2);background:var(--bg);border-radius:8px;padding:7px 10px;margin-bottom:8px;font-weight:500;}
+.d-toolbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.tool-btn{padding:7px 12px;border-radius:10px;border:1.5px solid var(--border-2);background:var(--bg);color:var(--text-2);font-size:12px;font-family:var(--font);font-weight:700;cursor:pointer;transition:all .13s;}
+.tool-btn.on{background:var(--brand);color:#fff;border-color:var(--brand);}
+.tool-btn.on-red{background:#E24B4A;color:#fff;border-color:#E24B4A;}
+.tool-btn.on-green{background:var(--green);color:#fff;border-color:var(--green);}
+.tool-btn.on-amber{background:#BA7517;color:#fff;border-color:#BA7517;}
+.design-court-wrap{border-radius:var(--radius-lg);overflow:hidden;border:1.5px solid var(--border);margin-bottom:10px;background:#c8922a;touch-action:none;}
+.design-court-wrap canvas{display:block;width:100%;}
+.d-bottom{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;}
+.pd-name-input{flex:1;padding:9px 12px;border-radius:10px;border:1.5px solid var(--border-2);background:var(--bg);color:var(--text);font-size:14px;font-family:var(--font);outline:none;min-width:100px;}
+.pd-name-input:focus{border-color:var(--brand);}
+.pd-save-btn{padding:9px 16px;border-radius:10px;border:none;background:var(--brand);color:#fff;font-size:13px;font-family:var(--font);font-weight:700;cursor:pointer;white-space:nowrap;}
+.pd-clear-btn{padding:9px 12px;border-radius:10px;border:1.5px solid var(--border-2);background:var(--bg);color:var(--text-2);font-size:13px;cursor:pointer;font-family:var(--font);}
+.pd-save-msg{font-size:13px;color:var(--green);min-height:18px;margin-bottom:4px;font-weight:600;}
+.pd-play-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;}
+.pd-play-hdr{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+.pd-play-title{font-family:var(--font);font-size:15px;font-weight:800;color:var(--text);}
+.pd-play-meta{font-size:12px;color:var(--text-3);margin-top:2px;}
+.pd-play-chev{font-size:18px;color:var(--text-3);transition:transform .2s;}
+.pd-play-card.open .pd-play-chev{transform:rotate(90deg);}
+.pd-play-body{padding:0 14px 14px;display:none;}
+.pd-play-card.open .pd-play-body{display:block;}
+.pd-viewer-wrap{border-radius:12px;overflow:hidden;background:#c8922a;margin-bottom:10px;}
+.pd-viewer-wrap canvas{display:block;width:100%;}
+.pos-label{font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:6px;font-family:var(--font);}
+.pos-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.pos-btn{padding:6px 14px;border-radius:999px;border:1.5px solid var(--border-2);background:var(--bg);color:var(--text-2);font-size:12px;font-family:var(--font);font-weight:700;cursor:pointer;transition:all .13s;}
+.pos-btn.on{background:var(--brand);color:#fff;border-color:var(--brand);}
+.persp-box{background:var(--green-light);border-radius:12px;padding:12px 14px;margin-bottom:10px;display:none;}
+.persp-box.active{display:block;}
+.persp-title{font-family:var(--font);font-size:13px;font-weight:800;color:#27500A;margin-bottom:4px;}
+.persp-desc{font-size:13px;color:#3B6D11;line-height:1.6;font-weight:500;}
+.pd-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.pd-anim-btn{padding:8px 16px;border-radius:10px;border:none;background:var(--brand);color:#fff;font-size:13px;font-family:var(--font);font-weight:700;cursor:pointer;}
+.pd-del-btn{padding:6px 12px;border-radius:8px;border:1.5px solid var(--red-light);background:transparent;color:var(--red);font-size:12px;font-family:var(--font);font-weight:700;cursor:pointer;margin-left:auto;}
+.star-row{display:flex;gap:3px;align-items:center;}
+.pstar{font-size:20px;cursor:pointer;color:#ddd;transition:color .13s;}
+.pstar.on{color:#EF9F27;}
+.rating-ct{font-size:11px;color:var(--text-3);margin-left:4px;font-weight:600;}
+.pd-empty{text-align:center;padding:2rem;color:var(--text-3);font-size:14px;}
+.plays-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.plays-hdr-title{font-family:var(--font);font-size:17px;font-weight:800;color:var(--text);}
+.plays-ct-badge{font-size:12px;color:var(--text-2);background:var(--bg);padding:3px 10px;border-radius:999px;font-weight:600;}
+
 /* ─── CONFETTI ─── */
 .confetti-piece {
   position: fixed; top: -10px; width: 10px; height: 10px;
@@ -448,6 +509,7 @@ body {
     <div class="nav-tile nt-rules" onclick="showSec('rules',this)"><span class="ntile-icon">📖</span><span class="ntile-lbl">Rules</span></div>
     <div class="nav-tile nt-plays" onclick="showSec('plays',this)"><span class="ntile-icon">📋</span><span class="ntile-lbl">Plays</span></div>
     <div class="nav-tile nt-challenge" onclick="showSec('challenge',this)"><span class="ntile-icon">🎯</span><span class="ntile-lbl">Tasks</span></div>
+    <div class="nav-tile" style="background:#FBEAF0;color:#72243E;" onclick="showSec('designer',this)"><span class="ntile-icon">✏️</span><span class="ntile-lbl">Design</span></div>
   </div>
 
   <!-- QUIZ -->
@@ -506,6 +568,62 @@ body {
       <div class="leg"><div class="leg-dot" style="background:#3b82f6"></div>Your team</div>
       <div class="leg"><div class="leg-dot" style="background:#ef4444"></div>Opponent</div>
       <div class="leg"><div class="leg-dot" style="background:#f59e0b"></div>Ball</div>
+    </div>
+  </div>
+
+  <!-- PLAY DESIGNER -->
+  <div id="designer" class="section">
+    <div class="pd-mode-tabs">
+      <div class="pd-mtab on" id="pd-view-tab" onclick="pdSwitch('view',this)">📋 Playbook</div>
+      <div class="pd-mtab" id="pd-admin-tab" onclick="pdSwitch('admin',this)">🔒 Coach mode</div>
+    </div>
+
+    <!-- VIEWER -->
+    <div id="pd-view" class="pd-pane active">
+      <div class="plays-hdr">
+        <div class="plays-hdr-title">Coach's playbook</div>
+        <div class="plays-ct-badge" id="pd-plays-ct">0 plays</div>
+      </div>
+      <div id="pd-plays-list"></div>
+    </div>
+
+    <!-- ADMIN -->
+    <div id="pd-admin" class="pd-pane">
+      <div id="pd-lock" class="admin-lock">
+        <div class="lock-icon">🔐</div>
+        <div class="lock-title">Coach access</div>
+        <div class="lock-sub">Enter your 4-digit PIN to design plays</div>
+        <div class="pin-row">
+          <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+          <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+        </div>
+        <div class="numpad">
+          <div class="nkey" onclick="pdPin('1')">1</div><div class="nkey" onclick="pdPin('2')">2</div><div class="nkey" onclick="pdPin('3')">3</div>
+          <div class="nkey" onclick="pdPin('4')">4</div><div class="nkey" onclick="pdPin('5')">5</div><div class="nkey" onclick="pdPin('6')">6</div>
+          <div class="nkey" onclick="pdPin('7')">7</div><div class="nkey" onclick="pdPin('8')">8</div><div class="nkey" onclick="pdPin('9')">9</div>
+          <div class="nkey" onclick="pdPin('del')">⌫</div><div class="nkey" onclick="pdPin('0')">0</div><div class="nkey" onclick="pdPin('clr')">✕</div>
+        </div>
+        <div class="pin-err" id="pd-pin-err"></div>
+      </div>
+      <div id="pd-designer-wrap" style="display:none;">
+        <div class="d-tip" id="pd-tip">Tap to place team players (blue) on the court</div>
+        <div class="d-toolbar">
+          <div class="tool-btn on" onclick="pdTool('team',this)">🔵 Team</div>
+          <div class="tool-btn" onclick="pdTool('opp',this)">🔴 Opp</div>
+          <div class="tool-btn" onclick="pdTool('run',this)">➡ Run</div>
+          <div class="tool-btn" onclick="pdTool('pass',this)">🏀 Pass</div>
+          <div class="tool-btn" onclick="pdTool('erase',this)">🗑 Erase</div>
+        </div>
+        <div class="design-court-wrap">
+          <canvas id="pd-canvas" height="300"></canvas>
+        </div>
+        <div class="d-bottom">
+          <input class="pd-name-input" id="pd-play-name" placeholder="Name this play..." maxlength="30"/>
+          <button class="pd-save-btn" onclick="pdSave()">💾 Save</button>
+          <button class="pd-clear-btn" onclick="pdClear()">↺</button>
+        </div>
+        <div class="pd-save-msg" id="pd-save-msg"></div>
+      </div>
     </div>
   </div>
 
@@ -705,6 +823,7 @@ function showSec(id,tile){
   if(id==='rules') renderRules(activeRS);
   if(id==='challenge') renderChallenges();
   if(id==='plays'){loadPlay(playSport,playIdx);}
+  if(id==='designer') pdRenderList();
 }
 
 // ── QUIZ ──────────────────────────────────────────────────────────────
@@ -885,6 +1004,280 @@ function confetti(){
     setTimeout(()=>el.remove(),4000);
   }
 }
+
+
+// ── PLAY DESIGNER ─────────────────────────────────────────────────────
+const ADMIN_PIN='1234';
+let pdPin_val='',pdTool_val='team',pdElements=[],pdDrawing=false,pdPath=[],pdSavedPlays=[],pdAnimStates={};
+let pdInited=false;
+
+const PD_POSITIONS={
+  PG:{title:'Point Guard',desc:'You are the floor general! Bring the ball up, call the play, and find open teammates. Make smart decisions and control the tempo.'},
+  SG:{title:'Shooting Guard',desc:'You are the scorer! Look for open shots off screens and cuts. Stay ready — the pass could come to you for a quick shot at any moment.'},
+  SF:{title:'Small Forward',desc:'You are the versatile attacker! You can drive to the basket or pop out for a jump shot. Read the defense and pick your moment.'},
+  PF:{title:'Power Forward',desc:'You are the inside presence! Set strong screens to free up teammates. After the screen, roll hard to the basket for an easy finish.'},
+  C:{title:'Center',desc:'You are the anchor! Stay near the basket, set big screens, and look for the easy pass inside. Your size creates space for everyone.'},
+};
+
+async function pdLoadPlays(){
+  try{const r=await window.storage.get('coach-plays');if(r&&r.value)pdSavedPlays=JSON.parse(r.value);}catch(e){pdSavedPlays=[];}
+  pdRenderList();
+}
+async function pdPersist(){try{await window.storage.set('coach-plays',JSON.stringify(pdSavedPlays));}catch(e){}}
+
+function pdSwitch(mode,btn){
+  document.querySelectorAll('.pd-mtab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.pd-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pd-'+mode).classList.add('active');
+  if(mode==='view') pdRenderList();
+}
+
+function pdPin(k){
+  const err=document.getElementById('pd-pin-err');err.textContent='';
+  if(k==='del') pdPin_val=pdPin_val.slice(0,-1);
+  else if(k==='clr') pdPin_val='';
+  else if(pdPin_val.length<4) pdPin_val+=k;
+  for(let i=0;i<4;i++) document.getElementById('pd'+i).classList.toggle('filled',i<pdPin_val.length);
+  if(pdPin_val.length===4){
+    if(pdPin_val===ADMIN_PIN){
+      document.getElementById('pd-lock').style.display='none';
+      document.getElementById('pd-designer-wrap').style.display='block';
+      pdInitCanvas();
+    } else {
+      err.textContent='Wrong PIN — try again!';
+      pdPin_val='';
+      for(let i=0;i<4;i++) document.getElementById('pd'+i).classList.remove('filled');
+    }
+  }
+}
+
+function pdInitCanvas(){
+  if(pdInited) return; pdInited=true;
+  const c=document.getElementById('pd-canvas');
+  c.width=680;c.height=300;
+  const getXY=(e,isTouch)=>{
+    const r=c.getBoundingClientRect();
+    if(isTouch){const t=e.touches[0];return{x:(t.clientX-r.left)*680/r.width,y:(t.clientY-r.top)*300/r.height};}
+    return{x:e.offsetX*(680/r.width),y:e.offsetY*(300/r.height)};
+  };
+  c.addEventListener('mousedown',e=>pdStart(getXY(e)));
+  c.addEventListener('mousemove',e=>{if(pdDrawing)pdMove(getXY(e));});
+  c.addEventListener('mouseup',()=>pdEnd());
+  c.addEventListener('touchstart',e=>{e.preventDefault();pdStart(getXY(e,true));},{passive:false});
+  c.addEventListener('touchmove',e=>{e.preventDefault();if(pdDrawing)pdMove(getXY(e,true));},{passive:false});
+  c.addEventListener('touchend',e=>{e.preventDefault();pdEnd();},{passive:false});
+  pdRedraw();
+}
+
+function pdTool(t,btn){
+  pdTool_val=t;
+  document.querySelectorAll('.d-toolbar .tool-btn').forEach(b=>{b.classList.remove('on','on-red','on-green','on-amber');});
+  const cls=t==='opp'?'on-red':t==='run'?'on-green':t==='pass'?'on-amber':'on';
+  btn.classList.add(cls);
+  const tips={team:'Tap to place a team player (blue). Tap again to remove.',opp:'Tap to place an opponent (red). Max 5 each.',run:'Drag to draw a run path (dashed white line).',pass:'Drag to draw a pass line (gold arrow).',erase:'Tap any player or line to remove it.'};
+  document.getElementById('pd-tip').textContent=tips[t];
+}
+
+function pdDistSeg(p,a,b){
+  const dx=b.x-a.x,dy=b.y-a.y;
+  if(!dx&&!dy) return Math.hypot(p.x-a.x,p.y-a.y);
+  const t=Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/(dx*dx+dy*dy)));
+  return Math.hypot(p.x-(a.x+t*dx),p.y-(a.y+t*dy));
+}
+
+function pdStart(p){
+  pdDrawing=true;
+  if(pdTool_val==='team'||pdTool_val==='opp'){
+    const ei=pdElements.findIndex(e=>e.type==='player'&&Math.hypot(e.x-p.x,e.y-p.y)<18);
+    if(ei>=0){pdElements.splice(ei,1);}
+    else{
+      const lbls=['PG','SG','SF','PF','C'];
+      const tc=pdElements.filter(e=>e.type==='player'&&e.team==='team').length;
+      const oc=pdElements.filter(e=>e.type==='player'&&e.team==='opp').length;
+      if(pdTool_val==='team'&&tc>=5||pdTool_val==='opp'&&oc>=5) return;
+      pdElements.push({type:'player',team:pdTool_val,x:p.x,y:p.y,label:pdTool_val==='team'?lbls[tc]:'D'+(oc+1)});
+    }
+    pdRedraw();
+  } else if(pdTool_val==='run'||pdTool_val==='pass'){
+    pdPath=[p];
+  } else if(pdTool_val==='erase'){
+    const ei=pdElements.findIndex(e=>{
+      if(e.type==='player') return Math.hypot(e.x-p.x,e.y-p.y)<18;
+      if(e.type==='path') return e.points.some((_,i,a)=>i>0&&pdDistSeg(p,a[i-1],a[i])<12);
+      return false;
+    });
+    if(ei>=0){pdElements.splice(ei,1);pdRedraw();}
+  }
+}
+
+function pdMove(p){
+  if(pdTool_val==='run'||pdTool_val==='pass'){pdPath.push(p);pdRedraw();pdDrawPath();}
+}
+
+function pdEnd(){
+  pdDrawing=false;
+  if((pdTool_val==='run'||pdTool_val==='pass')&&pdPath.length>3){
+    pdElements.push({type:'path',style:pdTool_val,points:[...pdPath]});
+  }
+  pdPath=[];pdRedraw();
+}
+
+function pdDrawBball(ctx,w,h){
+  const sx=w/680,sy=h/300;
+  ctx.fillStyle='#c8922a';ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle='rgba(255,255,255,0.5)';ctx.lineWidth=1.5;
+  ctx.strokeRect(20*sx,18*sy,640*sx,264*sy);
+  ctx.beginPath();ctx.moveTo(340*sx,18*sy);ctx.lineTo(340*sx,282*sy);ctx.stroke();
+  ctx.beginPath();ctx.arc(340*sx,150*sy,48*sx,0,Math.PI*2);ctx.stroke();
+  ctx.strokeRect(530*sx,74*sy,130*sx,152*sy);ctx.strokeRect(20*sx,74*sy,130*sx,152*sy);
+  ctx.beginPath();ctx.arc(595*sx,150*sy,56*sx,Math.PI*0.5,Math.PI*1.5);ctx.stroke();
+  ctx.beginPath();ctx.arc(85*sx,150*sy,56*sx,Math.PI*1.5,Math.PI*0.5);ctx.stroke();
+}
+
+function pdDrawPlayer(ctx,el,sx,sy,hi){
+  const x=el.x*sx,y=el.y*sy,color=el.team==='team'?'#3b82f6':'#ef4444';
+  ctx.save();
+  if(hi){ctx.shadowColor=color;ctx.shadowBlur=14;}
+  ctx.fillStyle=hi?'#fff':color;
+  ctx.beginPath();ctx.arc(x,y,14*Math.max(sx,sy),0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle=hi?color:'#fff';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle=hi?color:'#fff';
+  ctx.font=`bold ${Math.round(10*sx)}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(el.label,x,y+0.5);
+  ctx.restore();
+}
+
+function pdDrawPathEl(ctx,el,sx,sy){
+  if(el.points.length<2) return;
+  ctx.save();
+  ctx.strokeStyle=el.style==='pass'?'#f59e0b':'#fff';
+  ctx.lineWidth=2;
+  ctx.setLineDash(el.style==='run'?[6,4]:[]);
+  ctx.globalAlpha=0.9;
+  ctx.beginPath();ctx.moveTo(el.points[0].x*sx,el.points[0].y*sy);
+  el.points.forEach(p=>ctx.lineTo(p.x*sx,p.y*sy));ctx.stroke();
+  if(el.style==='pass'&&el.points.length>1){
+    const l=el.points[el.points.length-1],pr=el.points[el.points.length-2];
+    const ang=Math.atan2((l.y-pr.y)*sy,(l.x-pr.x)*sx);
+    ctx.globalAlpha=1;ctx.setLineDash([]);ctx.fillStyle='#f59e0b';
+    ctx.beginPath();ctx.save();ctx.translate(l.x*sx,l.y*sy);ctx.rotate(ang);
+    ctx.moveTo(0,0);ctx.lineTo(-12,-6);ctx.lineTo(-12,6);ctx.closePath();ctx.fill();ctx.restore();
+  }
+  ctx.restore();
+}
+
+function pdRedraw(){
+  const c=document.getElementById('pd-canvas');if(!c) return;
+  const ctx=c.getContext('2d');
+  pdDrawBball(ctx,c.width,c.height);
+  pdElements.forEach(e=>{if(e.type==='path') pdDrawPathEl(ctx,e,1,1);});
+  pdElements.forEach(e=>{if(e.type==='player') pdDrawPlayer(ctx,e,1,1,false);});
+}
+
+function pdDrawPath(){
+  if(pdPath.length<2) return;
+  const c=document.getElementById('pd-canvas');const ctx=c.getContext('2d');
+  ctx.save();ctx.strokeStyle=pdTool_val==='pass'?'#f59e0b':'#fff';ctx.lineWidth=2;
+  if(pdTool_val==='run') ctx.setLineDash([6,4]);ctx.globalAlpha=0.5;
+  ctx.beginPath();ctx.moveTo(pdPath[0].x,pdPath[0].y);pdPath.forEach(p=>ctx.lineTo(p.x,p.y));ctx.stroke();ctx.restore();
+}
+
+function pdClear(){pdElements=[];pdPath=[];pdRedraw();}
+
+function pdSave(){
+  const name=document.getElementById('pd-play-name').value.trim();
+  const msg=document.getElementById('pd-save-msg');
+  if(!name){msg.textContent='Give the play a name first!';msg.style.color='var(--red)';return;}
+  if(!pdElements.some(e=>e.type==='player')){msg.textContent='Add at least one player!';msg.style.color='var(--red)';return;}
+  pdSavedPlays.unshift({id:Date.now(),name,elements:JSON.parse(JSON.stringify(pdElements)),ratings:[],date:new Date().toLocaleDateString()});
+  pdPersist();
+  msg.textContent='✓ Play saved! Switch to Playbook to see it.';msg.style.color='var(--green)';
+  document.getElementById('pd-play-name').value='';
+  setTimeout(()=>msg.textContent='',3000);
+}
+
+function pdRenderList(){
+  const list=document.getElementById('pd-plays-list');
+  document.getElementById('pd-plays-ct').textContent=pdSavedPlays.length+' play'+(pdSavedPlays.length!==1?'s':'');
+  if(!pdSavedPlays.length){list.innerHTML='<div class="pd-empty">No plays yet.<br>Ask your coach to add some in Coach mode!</div>';return;}
+  list.innerHTML=pdSavedPlays.map((play,pi)=>`
+    <div class="pd-play-card" id="pdpc${play.id}">
+      <div class="pd-play-hdr" onclick="pdToggle(${play.id})">
+        <div><div class="pd-play-title">${play.name}</div><div class="pd-play-meta">Added ${play.date} · ${play.elements.filter(e=>e.type==='player'&&e.team==='team').length} players</div></div>
+        <span class="pd-play-chev">›</span>
+      </div>
+      <div class="pd-play-body">
+        <div class="pd-viewer-wrap"><canvas id="pdvc${play.id}" height="300" style="display:block;width:100%;"></canvas></div>
+        <div class="pos-label">Tap a position to see it from their view:</div>
+        <div class="pos-btns" id="pdpos${play.id}">${play.elements.filter(e=>e.type==='player').map(p=>`<button class="pos-btn" onclick="pdSelectPos(${play.id},'${p.label}')">${p.label}</button>`).join('')}</div>
+        <div class="persp-box" id="pdpersp${play.id}"><div class="persp-title" id="pdpt${play.id}"></div><div class="persp-desc" id="pdpd${play.id}"></div></div>
+        <div class="pd-actions">
+          <button class="pd-anim-btn" onclick="pdAnimate(${play.id})">▶ Animate</button>
+          <div class="star-row" id="pdstars${play.id}">${[1,2,3,4,5].map(s=>`<span class="pstar${pdAvg(play)>=s?' on':''}" onclick="pdRate(${play.id},${s})">★</span>`).join('')}<span class="rating-ct">${play.ratings.length} rating${play.ratings.length!==1?'s':''}</span></div>
+          <button class="pd-del-btn" onclick="pdDelete(${play.id})">Delete</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function pdAvg(play){return play.ratings.length?play.ratings.reduce((a,b)=>a+b,0)/play.ratings.length:0;}
+
+function pdToggle(id){
+  const card=document.getElementById('pdpc'+id);
+  const wasOpen=card.classList.contains('open');
+  document.querySelectorAll('.pd-play-card').forEach(c=>c.classList.remove('open'));
+  if(!wasOpen){card.classList.add('open');setTimeout(()=>pdRenderVC(id),50);}
+}
+
+function pdRenderVC(id,hiLabel){
+  const play=pdSavedPlays.find(p=>p.id===id);if(!play) return;
+  const vc=document.getElementById('pdvc'+id);if(!vc) return;
+  vc.width=680;vc.height=300;const ctx=vc.getContext('2d');
+  pdDrawBball(ctx,680,300);
+  play.elements.forEach(e=>{if(e.type==='path') pdDrawPathEl(ctx,e,1,1);});
+  play.elements.forEach(e=>{if(e.type==='player') pdDrawPlayer(ctx,e,1,1,e.label===hiLabel);});
+}
+
+function pdSelectPos(id,label){
+  document.querySelectorAll(`#pdpos${id} .pos-btn`).forEach(b=>b.classList.toggle('on',b.textContent===label));
+  const info=PD_POSITIONS[label]||{title:label,desc:'Watch the play carefully and be ready for your moment!'};
+  document.getElementById('pdpt'+id).textContent='You are the '+info.title;
+  document.getElementById('pdpd'+id).textContent=info.desc;
+  document.getElementById('pdpersp'+id).classList.add('active');
+  pdRenderVC(id,label);
+}
+
+function pdAnimate(id){
+  const play=pdSavedPlays.find(p=>p.id===id);if(!play) return;
+  const vc=document.getElementById('pdvc'+id);if(!vc) return;
+  vc.width=680;vc.height=300;const ctx=vc.getContext('2d');
+  const paths=play.elements.filter(e=>e.type==='path');
+  const players=play.elements.filter(e=>e.type==='player');
+  let t=0;const dur=120;
+  if(pdAnimStates[id]) cancelAnimationFrame(pdAnimStates[id]);
+  function frame(){
+    t++;const prog=Math.min(t/dur,1);
+    pdDrawBball(ctx,680,300);
+    paths.forEach(el=>{const sub={...el,points:el.points.slice(0,Math.max(2,Math.floor(el.points.length*prog)))};pdDrawPathEl(ctx,sub,1,1);});
+    players.forEach(el=>pdDrawPlayer(ctx,el,1,1,false));
+    if(t<dur) pdAnimStates[id]=requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+function pdRate(id,stars){
+  const play=pdSavedPlays.find(p=>p.id===id);if(!play) return;
+  play.ratings.push(stars);pdPersist();
+  const avg=pdAvg(play);
+  document.getElementById('pdstars'+id).innerHTML=[1,2,3,4,5].map(s=>`<span class="pstar${avg>=s?' on':''}" onclick="pdRate(${id},${s})">★</span>`).join('')+`<span class="rating-ct">${play.ratings.length} rating${play.ratings.length!==1?'s':''}</span>`;
+}
+
+function pdDelete(id){
+  pdSavedPlays=pdSavedPlays.filter(p=>p.id!==id);pdPersist();pdRenderList();
+}
+
+pdLoadPlays();
 
 // init
 buildAvatars();
