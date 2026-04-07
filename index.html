@@ -412,6 +412,24 @@ body {
 .plays-hdr-title{font-family:var(--font);font-size:17px;font-weight:800;color:var(--text);}
 .plays-ct-badge{font-size:12px;color:var(--text-2);background:var(--bg);padding:3px 10px;border-radius:999px;font-weight:600;}
 
+/* ─── ACTION BUTTONS ─── */
+.action-btn{padding:8px 14px;border-radius:12px;border:1.5px solid var(--border-2);background:var(--bg);color:var(--text);font-size:13px;font-family:var(--font);font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.action-btn:hover{transform:scale(1.03);}
+.action-make{border-color:#3B6D11;background:#EAF3DE;color:#27500A;}
+.action-make:hover{background:#C0DD97;}
+.action-miss{border-color:#854F0B;background:#FAEEDA;color:#633806;}
+.action-miss:hover{background:#FAC775;}
+.action-steal{border-color:#185FA5;background:#E6F1FB;color:#0C447C;}
+.action-steal:hover{background:#B5D4F4;}
+.action-foul{border-color:#A32D2D;background:#FCEBEB;color:#791F1F;}
+.action-foul:hover{background:#F7C1C1;}
+
+/* ─── PLAYER CELEBRATION ─── */
+@keyframes celebrate{0%{transform:scale(1)}25%{transform:scale(1.35)}50%{transform:scale(0.9)}75%{transform:scale(1.2)}100%{transform:scale(1)}}
+@keyframes reboundBounce{0%{transform:translateY(0)}30%{transform:translateY(-18px)}60%{transform:translateY(0)}80%{transform:translateY(-8px)}100%{transform:translateY(0)}}
+.floating-label{position:absolute;pointer-events:none;font-family:var(--font);font-weight:900;font-size:20px;animation:floatUp 1.4s ease forwards;}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-60px) scale(1.3)}}
+
 /* ─── LANDING ─── */
 .landing-hero{text-align:center;padding:2.5rem 1.5rem 2rem;}
 .landing-role-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 1.5rem 2rem;}
@@ -585,6 +603,17 @@ body {
               <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-3);"><div style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0;"></div>Opponent</div>
               <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-3);"><div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;flex-shrink:0;"></div>Ball</div>
               <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-3);"><div style="width:8px;height:8px;border-radius:50%;border:1px dashed #aaa;flex-shrink:0;"></div>Ghost</div>
+            </div>
+            <!-- ACTION BUTTONS -->
+            <div style="border-top:0.5px solid var(--border);padding-top:10px;margin-top:2px;">
+              <div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;font-family:var(--font);">Play actions</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="action-btn action-make" onclick="coachTriggerAction('make')">🏀 Shot — make!</button>
+                <button class="action-btn action-miss" onclick="coachTriggerAction('miss')">🔄 Shot — miss + rebound</button>
+                <button class="action-btn action-steal" onclick="coachTriggerAction('steal')">⚡ Steal!</button>
+                <button class="action-btn action-foul" onclick="coachTriggerAction('foul')">🚨 Foul called</button>
+              </div>
+              <div id="coach-action-msg" style="font-size:13px;font-weight:600;min-height:20px;margin-top:8px;text-align:center;"></div>
             </div>
           </div>
         </div>
@@ -1478,6 +1507,185 @@ async function coachSavePlay(){
   msg.textContent='✓ Saved to playbook!';msg.style.color='var(--green)';
   document.getElementById('coach-play-name').value='';
   setTimeout(()=>msg.textContent='',3000);
+}
+
+// ── COACH PLAY ACTIONS ────────────────────────────────────────────────
+let coachActionRaf=null;
+
+function coachTriggerAction(type){
+  if(coachActionRaf) cancelAnimationFrame(coachActionRaf);
+  const msg=document.getElementById('coach-action-msg');
+  if(type==='make') coachAnimateMake(msg);
+  else if(type==='miss') coachAnimateMiss(msg);
+  else if(type==='steal') coachAnimateSteal(msg);
+  else if(type==='foul') coachAnimateFoul(msg);
+}
+
+function coachGetShooter(){
+  const tp=coachPlayers.filter(p=>p.team==='team');
+  if(!tp.length) return coachPlayers[0];
+  return tp.reduce((b,p)=>Math.hypot(p.x-coachBall.x,p.y-coachBall.y)<Math.hypot(b.x-coachBall.x,b.y-coachBall.y)?p:b,tp[0]);
+}
+
+function coachGetRebounder(){
+  const shooter=coachGetShooter();
+  const others=coachPlayers.filter(p=>p.team==='team'&&p.id!==shooter.id);
+  return others.length?others[Math.floor(Math.random()*others.length)]:shooter;
+}
+
+function coachRenderWithOverlay(overlayFn){
+  const c=document.getElementById('coach-court');if(!c) return;
+  const ctx=c.getContext('2d');
+  ctx.clearRect(0,0,680,300);pdDrawCourt(ctx,680,300);
+  if(coachKFs.length>0) coachKFs[coachKFs.length-1].players.forEach(p=>pdDrawPl(ctx,p,.22,true));
+  coachPlayers.forEach(p=>pdDrawPl(ctx,p,1,false));
+  pdDrawBl(ctx,coachBall,1);
+  if(overlayFn) overlayFn(ctx);
+}
+
+function coachDrawShotArc(ctx,from,to,t,color){
+  const mid={x:(from.x+to.x)/2,y:Math.min(from.y,to.y)-80};
+  ctx.save();ctx.strokeStyle=color;ctx.lineWidth=2;ctx.setLineDash([4,3]);ctx.globalAlpha=0.5;
+  ctx.beginPath();ctx.moveTo(from.x,from.y);
+  for(let i=0;i<=20;i++){const s=i/20*t;const qx=from.x+(mid.x-from.x)*s+(to.x-mid.x)*s;const qy=from.y+(mid.y-from.y)*s+(to.y-mid.y)*s;ctx.lineTo(qx,qy);}
+  ctx.stroke();ctx.setLineDash([]);
+  const px=from.x+(mid.x-from.x)*t+(to.x-mid.x)*t;
+  const py=from.y+(mid.y-from.y)*t+(to.y-mid.y)*t;
+  ctx.globalAlpha=1;ctx.fillStyle='#f59e0b';ctx.beginPath();ctx.arc(px,py,8,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();ctx.restore();
+}
+
+function coachAnimateMake(msg){
+  const basket={x:595,y:150};
+  const from={x:coachBall.x,y:coachBall.y};
+  let t=0,phase='arc';msg.textContent='';
+  coachActionRaf=requestAnimationFrame(function frame(){
+    t+=0.035;
+    if(phase==='arc'&&t>=1){phase='celebrate';t=0;}
+    if(phase==='arc'){
+      coachRenderWithOverlay(ctx=>{
+        coachDrawShotArc(ctx,from,basket,t,'#f59e0b');
+        if(t>0.8){ctx.save();ctx.globalAlpha=(t-0.8)*5*0.6;ctx.strokeStyle='#ff6600';ctx.lineWidth=3;ctx.beginPath();ctx.arc(basket.x,basket.y,18*(1+(t-0.8)*3),0,Math.PI*2);ctx.stroke();ctx.restore();}
+      });
+    } else {
+      const scale=1+Math.sin(t*Math.PI*6)*0.15*(1-Math.min(t/0.8,1));
+      coachRenderWithOverlay(ctx=>{
+        coachPlayers.forEach(p=>{
+          if(p.team==='team'){
+            ctx.save();ctx.translate(p.x,p.y);ctx.scale(scale,scale);ctx.translate(-p.x,-p.y);
+            ctx.fillStyle='#27a848';ctx.beginPath();ctx.arc(p.x,p.y,14,0,Math.PI*2);ctx.fill();
+            ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+            ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(p.label,p.x,p.y+.5);ctx.restore();
+          }
+        });
+        coachBall.x=basket.x;coachBall.y=basket.y;
+        ctx.save();ctx.globalAlpha=0.6*Math.max(0,1-t/0.8);ctx.strokeStyle='#fff';ctx.lineWidth=1.5;
+        for(let i=0;i<4;i++){ctx.beginPath();ctx.arc(basket.x,basket.y+i*6,10-i*1.5,0,Math.PI*2);ctx.stroke();}ctx.restore();
+        if(t<0.5){ctx.save();ctx.globalAlpha=1-t*2;ctx.font='bold 22px sans-serif';ctx.fillStyle='#27a848';ctx.textAlign='center';ctx.fillText('+2 🏀',basket.x,basket.y-30-t*40);ctx.restore();}
+      });
+      if(t>0.15&&!msg.textContent){msg.style.color='var(--green)';msg.textContent='Bucket! All offensive players turn green! 🎉';}
+      if(t>=1){coachCelebrationConfetti();return;}
+    }
+    coachActionRaf=requestAnimationFrame(frame);
+  });
+}
+
+function coachAnimateMiss(msg){
+  const basket={x:595,y:150};
+  const from={x:coachBall.x,y:coachBall.y};
+  const rimHit={x:basket.x+16,y:basket.y+8};
+  const rebounder=coachGetRebounder();
+  const reboundLand={x:basket.x-30+Math.random()*60,y:basket.y-20+Math.random()*40};
+  let t=0,phase='arc';msg.textContent='';
+  coachActionRaf=requestAnimationFrame(function frame(){
+    t+=0.032;
+    if(phase==='arc'&&t>=1){phase='rebound';t=0;coachBall.x=rimHit.x;coachBall.y=rimHit.y;}
+    else if(phase==='rebound'&&t>=1){coachBall.x=reboundLand.x;coachBall.y=reboundLand.y;coachRender();return;}
+    if(phase==='arc'){
+      coachRenderWithOverlay(ctx=>{
+        coachDrawShotArc(ctx,from,rimHit,t,'#f59e0b');
+        if(t>0.85){ctx.save();ctx.strokeStyle='#ef4444';ctx.lineWidth=3;ctx.globalAlpha=(t-0.85)*6;ctx.beginPath();ctx.arc(basket.x,basket.y,18,0,Math.PI*2);ctx.stroke();ctx.restore();}
+      });
+    } else {
+      const bx=rimHit.x+(reboundLand.x-rimHit.x)*t;
+      const by=rimHit.y+(reboundLand.y-rimHit.y)*t-Math.sin(t*Math.PI)*30;
+      coachBall.x=bx;coachBall.y=by;
+      coachRenderWithOverlay(ctx=>{
+        ctx.save();const sc=1+Math.sin(t*Math.PI*4)*0.12;
+        ctx.translate(rebounder.x,rebounder.y);ctx.scale(sc,sc);ctx.translate(-rebounder.x,-rebounder.y);
+        ctx.fillStyle='#185FA5';ctx.beginPath();ctx.arc(rebounder.x,rebounder.y,16,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle='#fff';ctx.lineWidth=2.5;ctx.stroke();
+        ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(rebounder.label,rebounder.x,rebounder.y+.5);ctx.restore();
+        if(t>0.3){ctx.save();ctx.globalAlpha=Math.min((t-0.3)*3,1);ctx.font='bold 16px sans-serif';ctx.fillStyle='#185FA5';ctx.textAlign='center';ctx.fillText('REBOUND!',rebounder.x,rebounder.y-26);ctx.restore();}
+      });
+      if(t>0.3&&!msg.textContent){msg.style.color='var(--brand)';msg.textContent='Miss off the rim! '+rebounder.label+' gets the rebound! 💪';}
+    }
+    coachActionRaf=requestAnimationFrame(frame);
+  });
+}
+
+function coachAnimateSteal(msg){
+  const oppPlayers=coachPlayers.filter(p=>p.team==='opp');
+  if(!oppPlayers.length){msg.style.color='var(--text-2)';msg.textContent='Add an opponent first!';return;}
+  const origBall={x:coachBall.x,y:coachBall.y};
+  const stealer=oppPlayers.reduce((b,p)=>Math.hypot(p.x-coachBall.x,p.y-coachBall.y)<Math.hypot(b.x-coachBall.x,b.y-coachBall.y)?p:b,oppPlayers[0]);
+  let t=0;msg.textContent='';
+  coachActionRaf=requestAnimationFrame(function frame(){
+    t+=0.04;
+    const dashT=Math.min(t/0.6,1);
+    coachBall.x=origBall.x+(stealer.x-origBall.x)*dashT;
+    coachBall.y=origBall.y+(stealer.y-origBall.y)*dashT;
+    coachRenderWithOverlay(ctx=>{
+      ctx.save();const sc=1+Math.sin(t*Math.PI*8)*0.1*(1-Math.min(t,1));
+      ctx.translate(stealer.x,stealer.y);ctx.scale(sc,sc);ctx.translate(-stealer.x,-stealer.y);
+      ctx.fillStyle='#ef4444';ctx.beginPath();ctx.arc(stealer.x,stealer.y,16,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#fff';ctx.lineWidth=2.5;ctx.stroke();
+      ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(stealer.label,stealer.x,stealer.y+.5);ctx.restore();
+      if(dashT<1){ctx.save();ctx.globalAlpha=0.6*(1-dashT);ctx.strokeStyle='#f59e0b';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(origBall.x,origBall.y);ctx.lineTo(stealer.x,stealer.y);ctx.stroke();ctx.restore();}
+      if(t>0.5){ctx.save();ctx.globalAlpha=Math.min((t-0.5)*4,1)*(1-Math.max(0,t-1.2)*2);ctx.font='bold 18px sans-serif';ctx.fillStyle='#ef4444';ctx.textAlign='center';ctx.fillText('STEAL! ⚡',stealer.x,stealer.y-30);ctx.restore();}
+    });
+    if(t>0.5&&!msg.textContent){msg.style.color='var(--red)';msg.textContent='Steal by '+stealer.label+'! Ball stripped away! ⚡';}
+    if(t<1.4) coachActionRaf=requestAnimationFrame(frame);
+    else coachRender();
+  });
+}
+
+function coachAnimateFoul(msg){
+  const foulPlayer=coachPlayers.find(p=>p.team==='opp')||coachPlayers[0];
+  let t=0;msg.textContent='';
+  coachActionRaf=requestAnimationFrame(function frame(){
+    t+=0.04;
+    coachRenderWithOverlay(ctx=>{
+      const flash=Math.max(0,Math.sin(t*Math.PI*5)*0.3*(1-Math.min(t/1.5,1)));
+      ctx.save();ctx.globalAlpha=flash;ctx.fillStyle='#ef4444';ctx.fillRect(0,0,680,300);ctx.restore();
+      coachPlayers.forEach(p=>{
+        if(p.id===foulPlayer.id){
+          ctx.save();const shake=Math.sin(t*60)*3*(1-Math.min(t/0.8,1));
+          ctx.translate(p.x+shake,p.y);
+          ctx.fillStyle='#ef4444';ctx.beginPath();ctx.arc(0,0,16,0,Math.PI*2);ctx.fill();
+          ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();
+          ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(p.label,0,.5);ctx.restore();
+        }
+      });
+      if(t>0.2){ctx.save();ctx.globalAlpha=Math.min((t-0.2)*3,1)*(1-Math.max(0,t-1.2)*2);
+      ctx.font='bold 22px sans-serif';ctx.fillStyle='#ef4444';ctx.textAlign='center';ctx.fillText('🚨 FOUL!',340,80);
+      ctx.font='bold 14px sans-serif';ctx.fillStyle='#fff';ctx.fillText(foulPlayer.label+' commits the foul',340,108);ctx.restore();}
+    });
+    if(t>0.4&&!msg.textContent){msg.style.color='var(--red)';msg.textContent='Foul on '+foulPlayer.label+'! Whistle blown! 🚨';}
+    if(t<1.6) coachActionRaf=requestAnimationFrame(frame);
+    else coachRender();
+  });
+}
+
+function coachCelebrationConfetti(){
+  const colors=['#27a848','#185FA5','#EF9F27','#fff','#f59e0b'];
+  const courtEl=document.getElementById('coach-court');if(!courtEl) return;
+  const rect=courtEl.getBoundingClientRect();
+  for(let i=0;i<40;i++){
+    const el=document.createElement('div');
+    el.style.cssText=`position:fixed;pointer-events:none;z-index:9999;border-radius:${Math.random()>.5?'50%':'2px'};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;background:${colors[Math.floor(Math.random()*colors.length)]};left:${rect.left+Math.random()*rect.width}px;top:${rect.top+Math.random()*rect.height/2}px;animation:confettiFall ${1.5+Math.random()*1.5}s linear ${Math.random()*.4}s forwards;`;
+    document.body.appendChild(el);setTimeout(()=>el.remove(),3000);
+  }
 }
 
 // ── COACH PLAYBOOK ─────────────────────────────────────────────────────
